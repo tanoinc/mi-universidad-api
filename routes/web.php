@@ -12,9 +12,18 @@
 */
 
 $app->get('/', function () use ($app) {
-    return $app->version();
+    return "Hola Mundo! '/' ";
 });
 
 $app->get('/hola', function () use ($app) {
     return "Hola Mundo!";
+});
+
+$app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers'], function($app)
+{
+    $app->get('application','ApplicationController@index');
+    $app->get('application/{id}','ApplicationController@getApplication');
+    $app->post('application','ApplicationController@createApplication');
+    $app->put('application/{id}','ApplicationController@updateApplication');
+    $app->delete('application/{id}','ApplicationController@deleteApplication');    
 });
