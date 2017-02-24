@@ -6,6 +6,7 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateApplicationsTable extends Migration
 {
+
     /**
      * Run the migrations.
      *
@@ -13,12 +14,13 @@ class CreateApplicationsTable extends Migration
      */
     public function up()
     {
-        Schema::create('applications', function (Blueprint $table) {
+        Schema::create('application', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name', 50);
             $table->string('description', 255);
-            $table->string('secret_token', 100);
+            $table->string('token_secret', 100);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -29,6 +31,7 @@ class CreateApplicationsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('applications');
+        Schema::dropIfExists('application');
     }
+
 }

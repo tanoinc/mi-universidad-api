@@ -28,7 +28,7 @@ class ApplicationController extends Controller
 
     public function getApplication($id)
     {
-        $application = Application::find($id);
+        $application = Application::findOrFail($id);
 
         return response()->json($application);
     }
@@ -42,7 +42,7 @@ class ApplicationController extends Controller
 
     public function deleteApplication($id)
     {
-        $application = Application::find($id);
+        $application = Application::findOrFail($id);
         $application->delete();
 
         return response()->json('deleted');
@@ -50,7 +50,7 @@ class ApplicationController extends Controller
 
     public function updateApplication(Request $request, $id)
     {
-        $application = Application::find($id);
+        $application = Application::findOrFail($id);
         $application->name = $request->input('name');
         $application->description = $request->input('description');
         $application->secret_token = $request->input('secret_token');

@@ -16,11 +16,13 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Application extends Model
 {
+    protected $table = 'application';
+    
     protected $fillable = [
         'name', 'description',
     ];
     
     protected $hidden = [
-        'secret_token',
+        'token_secret',
     ];
 }

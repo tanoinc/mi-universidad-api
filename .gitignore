@@ -5,3 +5,4 @@ Homestead.yaml
 .env
 /nbproject/private/
 /nbproject
+lumen_ide_helper.php
