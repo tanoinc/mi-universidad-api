@@ -21,6 +21,7 @@ class InitialModel extends Migration
             $table->increments('id');
             $table->string('name', 50)->unique();
             $table->string('description', 255);
+            $table->boolean('granted');
             $table->timestamps();
         });
         Schema::create('application_privilege', function (Blueprint $table) {
@@ -31,15 +32,26 @@ class InitialModel extends Migration
             $table->foreign('application_id')->references('id')->on('application');
             $table->foreign('privilege_id')->references('id')->on('privilege');
         });
+        Schema::create('user', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('username', 255)->unique();
+            $table->string('password', 255);
+            $table->string('email', 255)->unique();
+            $table->string('hash_id', 100)->unique();
+            $table->timestamps();
+            $table->softDeletes();
+        });
         Schema::create('newsfeed', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('title', 150);
             $table->text('content');
             $table->boolean('send_notification');
             $table->integer('application_id')->unsigned();
+            $table->integer('user_id')->unsigned();
             $table->timestamps();
             $table->softDeletes();
             $table->foreign('application_id')->references('id')->on('application');
+            $table->foreign('user_id')->references('id')->on('user');
         });
     }
 
@@ -54,6 +66,7 @@ class InitialModel extends Migration
             $table->dropColumn('application_hash_id');
         });
         Schema::dropIfExists('newsfeed');
+        Schema::dropIfExists('user');
         Schema::dropIfExists('application_privilege');
         Schema::dropIfExists('privilege');
     }

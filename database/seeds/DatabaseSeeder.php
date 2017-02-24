@@ -13,6 +13,8 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call('PrivilegeTableSeeder');
+        $this->call('ApplicationTableSeeder');
+        $this->call('UserTableSeeder');
     }
 
 }

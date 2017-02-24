@@ -9,26 +9,19 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-
 /**
- * Description of Application
+ * The newsfeed model class
  *
  * @author tanoinc
  */
-class Application extends Model
+class Newsfeed extends Model
 {
+    protected $table = 'newsfeed';
 
-    protected $table = 'application';
     protected $fillable = [
-        'name', 'description',
+        'title',
+        'content',
+        'send_notification',
+        'application_id',
     ];
-    protected $hidden = [
-        'token_secret',
-    ];
-
-    public function privileges()
-    {
-        return $this->belongsToMany('App\Privilege');
-    }
-
 }

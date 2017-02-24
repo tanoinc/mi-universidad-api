@@ -21,9 +21,16 @@ $app->get('/hola', function () use ($app) {
 
 $app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers'], function($app)
 {
+    // Application routes
     $app->get('application','ApplicationController@index');
     $app->get('application/{id}','ApplicationController@getApplication');
     $app->post('application','ApplicationController@createApplication');
     $app->put('application/{id}','ApplicationController@updateApplication');
-    $app->delete('application/{id}','ApplicationController@deleteApplication');    
+    $app->delete('application/{id}','ApplicationController@deleteApplication');
+    
+    // Newsfeed routes
+    $app->get('newsfeed','NewsfeedController@index');
+    $app->post('newsfeed','NewsfeedController@createNewsfeed');
+    
+    
 });
