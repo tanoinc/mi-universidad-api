@@ -16,6 +16,7 @@ class InitialModel extends Migration
     {
         Schema::table('application', function(Blueprint $table) {
             $table->string('application_hash_id', 50)->unique()->after('id');
+            $table->integer('privilege_version')->default(1);
         });
         Schema::create('privilege', function (Blueprint $table) {
             $table->increments('id');
@@ -28,6 +29,7 @@ class InitialModel extends Migration
             $table->increments('id');
             $table->integer('application_id')->unsigned();
             $table->integer('privilege_id')->unsigned();
+            $table->integer('version')->default(1);
             $table->timestamps();
             $table->foreign('application_id')->references('id')->on('application');
             $table->foreign('privilege_id')->references('id')->on('privilege');
@@ -56,13 +58,25 @@ class InitialModel extends Migration
             $table->string('title', 150);
             $table->text('content');
             $table->boolean('send_notification');
-            $table->integer('application_id')->unsigned();
-            $table->integer('user_id')->unsigned();
             $table->timestamps();
             $table->softDeletes();
-            $table->foreign('application_id')->references('id')->on('application');
+        });
+        Schema::create('newsfeed_user', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->integer('newsfeed_id')->unsigned();
+            $table->integer('user_id')->unsigned();
+            $table->timestamps();
+            $table->foreign('newsfeed_id')->references('id')->on('newsfeed');
             $table->foreign('user_id')->references('id')->on('user');
         });
+        Schema::create('newsfeed_application', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->integer('newsfeed_id')->unsigned();
+            $table->integer('application_id')->unsigned();
+            $table->timestamps();
+            $table->foreign('newsfeed_id')->references('id')->on('newsfeed');
+            $table->foreign('application_id')->references('id')->on('application');
+        });        
     }
 
     /**
@@ -74,7 +88,10 @@ class InitialModel extends Migration
     {
         Schema::table('application', function (Blueprint $table) {
             $table->dropColumn('application_hash_id');
+            $table->dropColumn('privilege_version');
         });
+        Schema::dropIfExists('newsfeed_application');
+        Schema::dropIfExists('newsfeed_user');
         Schema::dropIfExists('newsfeed');
         Schema::dropIfExists('user_application');
         Schema::dropIfExists('user');
