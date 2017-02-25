@@ -41,6 +41,16 @@ class InitialModel extends Migration
             $table->timestamps();
             $table->softDeletes();
         });
+        Schema::create('user_application', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('application_id')->unsigned();
+            $table->integer('user_id')->unsigned();
+            $table->string('external_id', 100);
+            $table->timestamps();
+            $table->softDeletes();
+            $table->foreign('application_id')->references('id')->on('application');
+            $table->foreign('user_id')->references('id')->on('user');
+        });
         Schema::create('newsfeed', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('title', 150);
@@ -66,6 +76,7 @@ class InitialModel extends Migration
             $table->dropColumn('application_hash_id');
         });
         Schema::dropIfExists('newsfeed');
+        Schema::dropIfExists('user_application');
         Schema::dropIfExists('user');
         Schema::dropIfExists('application_privilege');
         Schema::dropIfExists('privilege');
