@@ -22,7 +22,6 @@ class InitialModel extends Migration
             $table->increments('id');
             $table->string('name', 50)->unique();
             $table->string('description', 255);
-            $table->boolean('granted');
             $table->timestamps();
         });
         Schema::create('application_privilege', function (Blueprint $table) {
@@ -48,6 +47,7 @@ class InitialModel extends Migration
             $table->integer('application_id')->unsigned();
             $table->integer('user_id')->unsigned();
             $table->string('external_id', 100);
+            $table->integer('granted_privilege_version');
             $table->timestamps();
             $table->softDeletes();
             $table->foreign('application_id')->references('id')->on('application');
