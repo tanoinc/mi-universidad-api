@@ -28,6 +28,9 @@ $app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers'], funct
     $app->put('application/{id}','ApplicationController@updateApplication');
     $app->delete('application/{id}','ApplicationController@deleteApplication');
     
+    // Application privileges
+    $app->get('application/{id}/granted_privileges','ApplicationController@getApplicationGrantedPrivileges');
+    
     // Newsfeed routes
     $app->get('newsfeed','NewsfeedController@index');
     $app->post('newsfeed','NewsfeedController@createNewsfeed');

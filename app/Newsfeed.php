@@ -21,7 +21,16 @@ class Newsfeed extends Model
     protected $fillable = [
         'title',
         'content',
-        'send_notification',
-        'application_id',
+        'send_notification'
     ];
+
+    public function applications()
+    {
+        return $this->belongsToMany('App\Application');
+    }
+    
+    public function users()
+    {
+        return $this->belongsToMany('App\User');
+    }      
 }

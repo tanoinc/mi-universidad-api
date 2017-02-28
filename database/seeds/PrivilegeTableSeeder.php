@@ -28,22 +28,18 @@ class PrivilegeTableSeeder extends Seeder
         Privilege::create([
             'name' => 'newsfeed:put',
             'description' => 'To create a new post in the newsfeed',
-
         ]);
         Privilege::create([
             'name' => 'newsfeed:post',
             'description' => 'To update a post from the newsfeed',
-
         ]);
         Privilege::create([
             'name' => 'newsfeed:delete',
             'description' => 'To delete a post from the newsfeed',
-
         ]);
         Privilege::create([
             'name' => 'newsfeed:get',
             'description' => 'To get a post from the newsfeed',
-
         ]);         
     }
 

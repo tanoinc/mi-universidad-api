@@ -31,4 +31,9 @@ class Application extends Model
         return $this->belongsToMany('App\Privilege');
     }
 
+    public function granted_privileges()
+    {
+        return $this->privileges()->wherePivot('version', '=', $this->privilege_version);
+    }
+
 }

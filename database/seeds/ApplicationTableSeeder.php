@@ -9,7 +9,7 @@
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
 use App\Application;
-
+use App\Privilege;
 /**
  * The Application table seeder
  *
@@ -25,12 +25,14 @@ class ApplicationTableSeeder extends Seeder
      */
     public function run()
     {
-        Application::create([
+        $app = Application::create([
             'application_hash_id' => sha1(random_bytes(8).'mi-universidad-mobile'),
             'name' => 'mi-universidad-mobile',
             'description' => 'Mi-universidad Mobile app',
             'token_secret'  => sha1(random_bytes(8).microtime()),
         ]);
+        $all_privileges = Privilege::all();
+        $app->privileges()->attach($all_privileges);
     }
 
 }
