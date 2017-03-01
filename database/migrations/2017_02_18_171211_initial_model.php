@@ -63,7 +63,7 @@ class InitialModel extends Migration
         });
         Schema::create('newsfeed_user', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('newsfeed_id')->unsigned();
+            $table->bigInteger('newsfeed_id')->unsigned();
             $table->integer('user_id')->unsigned();
             $table->timestamps();
             $table->foreign('newsfeed_id')->references('id')->on('newsfeed');
@@ -71,7 +71,7 @@ class InitialModel extends Migration
         });
         Schema::create('newsfeed_application', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('newsfeed_id')->unsigned();
+            $table->bigInteger('newsfeed_id')->unsigned();
             $table->integer('application_id')->unsigned();
             $table->timestamps();
             $table->foreign('newsfeed_id')->references('id')->on('newsfeed');
