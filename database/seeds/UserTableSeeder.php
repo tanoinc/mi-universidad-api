@@ -9,6 +9,7 @@
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
 use App\User;
+use App\Application;
 
 /**
  * The Privilege table seeder
@@ -26,12 +27,14 @@ class UserTableSeeder extends Seeder
     public function run()
     {
         $hash = sha1(random_bytes(8).'admin');
-        User::create([
+        $user = User::create([
             'username' => 'admin', 
             'hash_id' => $hash, 
             'email' => '',
             'password' => password_hash(substr($hash, 0, 10), PASSWORD_DEFAULT),
         ]);
+        $app = Application::all()->first();
+        $user->applications()->attach($app, ['granted_privilege_version' => $app->privilege_version]);
     }
 
 }

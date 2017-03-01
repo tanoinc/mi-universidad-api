@@ -30,8 +30,13 @@ class NewsfeedController extends Controller
     public function getFromUser($user_hash_id)
     {
         $user = User::findByHashId($user_hash_id)->firstOrFail();
-
-        return response()->json($user->newsfeeds);
+        $newsfeeds = $user->newsfeeds;
+        $applications = $user->applications;
+        foreach ($applications as $application) {
+            $newsfeeds = array_merge($newsfeeds, $application->newsfeeds);
+        }
+        
+        return response()->json($newsfeeds);
     }
 
     public function createNewsfeed(Request $request)

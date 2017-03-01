@@ -35,5 +35,8 @@ class Application extends Model
     {
         return $this->privileges()->wherePivot('version', '=', $this->privilege_version);
     }
-
+    public function newsfeeds()
+    {
+        return $this->belongsToMany('App\Newsfeed', 'newsfeed_application');
+    }    
 }

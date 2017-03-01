@@ -29,7 +29,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     
     public function applications()
     {
-        return $this->belongsToMany('App\Application');
+        return $this->belongsToMany('App\Application', 'user_application');
     }
     
     public function newsfeeds()
