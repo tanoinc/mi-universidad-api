@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
         $this->call('PrivilegeTableSeeder');
         $this->call('ApplicationTableSeeder');
         $this->call('UserTableSeeder');
+        $this->call('NewsfeedTableSeeder');
     }
 
 }

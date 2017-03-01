@@ -21,7 +21,7 @@ $app->get('/hola', function () use ($app) {
 
 $app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers'], function($app)
 {
-    // Application routes
+    // Application
     $app->get('application','ApplicationController@index');
     $app->get('application/{id}','ApplicationController@getApplication');
     $app->post('application','ApplicationController@createApplication');
@@ -31,9 +31,8 @@ $app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers'], funct
     // Application privileges
     $app->get('application/{id}/granted_privileges','ApplicationController@getApplicationGrantedPrivileges');
     
-    // Newsfeed routes
+    // Newsfeed
     $app->get('newsfeed','NewsfeedController@index');
     $app->post('newsfeed','NewsfeedController@createNewsfeed');
-    
-    
+    $app->get('newsfeed/user/{user_hash_id}','NewsfeedController@getFromUser');
 });

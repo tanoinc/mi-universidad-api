@@ -10,6 +10,7 @@ namespace App\Http\Controllers;
 
 use App\Newsfeed;
 use Illuminate\Http\Request;
+use App\User;
 
 /**
  * The Newsfeed controller class
@@ -26,11 +27,11 @@ class NewsfeedController extends Controller
         return response()->json($newsfeed);
     }
 
-    public function getApplication($id)
+    public function getFromUser($user_hash_id)
     {
-        $application = Application::findOrFail($id);
+        $user = User::findByHashId($user_hash_id)->firstOrFail();
 
-        return response()->json($application);
+        return response()->json($user->newsfeeds);
     }
 
     public function createNewsfeed(Request $request)

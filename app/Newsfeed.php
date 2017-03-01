@@ -23,6 +23,8 @@ class Newsfeed extends Model
         'content',
         'send_notification'
     ];
+    
+    protected $hidden = ['pivot'];
 
     public function applications()
     {
