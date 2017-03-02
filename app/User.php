@@ -20,11 +20,11 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     protected $table = 'user';
 
     protected $fillable = [
-        'username', 'hash_id', 'email'
+        'password', 'email'
     ];
 
     protected $hidden = [
-        'password',
+        'password', 'id',
     ];
     
     public function applications()
@@ -40,5 +40,17 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     public function scopeFindByHashId($query, $hash_id)
     {
         return $query->where('hash_id', '=', $hash_id);
-    }    
+    }
+    
+    public static function register($user_data)
+    {
+        $user_data['username'] = $user_data['email'];
+        $user = static::firstOrNew(['username'=>$user_data['username']]);
+        $user->hash_id = sha1(random_bytes(8).$user_data['username']);
+        $user->password = password_hash($user_data['password'], PASSWORD_DEFAULT);
+        $user->email = $user_data['email'];
+        $user->save();
+        
+        return $user;
+    }
 }

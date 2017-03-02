@@ -29,10 +29,9 @@ class NewsfeedController extends Controller
 
     public function getFromUser(Request $request, $user_hash_id)
     {
-        //\Illuminate\Support\Facades\DB::connection()->enableQueryLog();
         $user = User::findByHashId($user_hash_id)->firstOrFail();
-        $newsfeeds = Newsfeed::getAllFromUser($user)->orderBy('created_at','desc')->get();
-        //print_r(\Illuminate\Support\Facades\DB::getQueryLog());
+        $newsfeeds = Newsfeed::getAllFromUser($user)->orderBy('created_at','desc')->simplePaginate(15);
+
         return response()->json($newsfeeds->values());
     }
 

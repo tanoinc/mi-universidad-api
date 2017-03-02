@@ -35,4 +35,7 @@ $app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers'], funct
     $app->get('newsfeed','NewsfeedController@index');
     $app->post('newsfeed','NewsfeedController@createNewsfeed');
     $app->get('newsfeed/user/{user_hash_id}','NewsfeedController@getFromUser');
+    
+    // User
+    $app->post('user','UserController@createUser');
 });
