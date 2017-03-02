@@ -27,16 +27,13 @@ class NewsfeedController extends Controller
         return response()->json($newsfeed);
     }
 
-    public function getFromUser($user_hash_id)
+    public function getFromUser(Request $request, $user_hash_id)
     {
+        //\Illuminate\Support\Facades\DB::connection()->enableQueryLog();
         $user = User::findByHashId($user_hash_id)->firstOrFail();
-        $newsfeeds = $user->newsfeeds;
-        $applications = $user->applications;
-        foreach ($applications as $application) {
-            $newsfeeds = array_merge($newsfeeds, $application->newsfeeds);
-        }
-        
-        return response()->json($newsfeeds);
+        $newsfeeds = Newsfeed::getAllFromUser($user)->orderBy('created_at','desc')->get();
+        //print_r(\Illuminate\Support\Facades\DB::getQueryLog());
+        return response()->json($newsfeeds->values());
     }
 
     public function createNewsfeed(Request $request)

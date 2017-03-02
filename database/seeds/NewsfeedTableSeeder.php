@@ -27,20 +27,38 @@ class NewsfeedTableSeeder extends Seeder
      */
     public function run()
     {
+        $app = Application::all()->first();
         $admin = User::all()->first();
         $newsfeed = Newsfeed::create([
             'title' => 'Bienvenido',
-            'content' => 'Esta es la primer noticia de tu Newsfeed!',
+            'content' => 'Esta es la primer noticia de tu Newsfeed personal!',
             'send_notification' => false,
+            'application_id' => $app->id,
+            'global' => 0,
         ]);
         $newsfeed->users()->attach($admin);
-        $app = Application::all()->first();
         $newsfeed = Newsfeed::create([
+            'title' => 'Bienvenido nuevamente!',
+            'content' => 'Esta es otra noticia de tu Newsfeed personal!',
+            'send_notification' => false,
+            'application_id' => $app->id,
+            'global' => 0,
+        ]);
+        $newsfeed->users()->attach($admin);
+        Newsfeed::create([
             'title' => sprintf('Bienvenido a "%s"', $app->name),
             'content' => sprintf('Esta es la primer noticia de tu Newsfeed de "%s"!', $app->name),
             'send_notification' => false,
+            'application_id' => $app->id,
+            'global' => 1,
         ]);
-        $newsfeed->applications()->attach($app);
+        Newsfeed::create([
+            'title' => sprintf('Otra noticia de "%s"', $app->name),
+            'content' => sprintf('Esta es otra noticia de tu Newsfeed de "%s"!', $app->name),
+            'send_notification' => false,
+            'application_id' => $app->id,
+            'global' => 1,
+        ]);
     }
 
 }

@@ -9,6 +9,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 /**
  * The newsfeed model class
  *
@@ -26,18 +27,32 @@ class Newsfeed extends Model
     
     protected $hidden = ['pivot'];
 
-    public function applications()
+    public function application()
     {
-        return $this->belongsToMany('App\Application', 'newsfeed_application');
+        return $this->hasOne('App\Application');
     }
     
     public function users()
     {
         return $this->belongsToMany('App\User');
     }
-
-    public function scopeFindByApplications($query, $applications)
+    
+    public static function getAllFromUser($user)
     {
-        return $query->where('hash_id', '=', $hash_id);
-    }    
+        $query = DB::table('newsfeed')->whereIn('id', function($query_in) use ($user) {
+            $query_in->select('newsfeed_id')
+                    ->from('newsfeed_user')
+                    ->where('user_id', '=', $user->id);
+        });
+        $query2= DB::table('newsfeed')->
+            where('global', '=', true)->
+            whereIn('application_id', function($query_in) use ($user) {
+                $query_in->select('application_id')
+                        ->from('user_application')
+                        ->where('user_id', '=', $user->id);
+            })
+        ->union($query);
+        return $query2;
+    }
+   
 }

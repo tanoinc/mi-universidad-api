@@ -26,7 +26,7 @@ class UserTableSeeder extends Seeder
      */
     public function run()
     {
-        $hash = sha1(random_bytes(8).'admin');
+        $hash = 'abc123'; //sha1(random_bytes(8).'admin'); // Comentado para debug
         $user = User::create([
             'username' => 'admin', 
             'hash_id' => $hash, 
@@ -34,7 +34,7 @@ class UserTableSeeder extends Seeder
             'password' => password_hash(substr($hash, 0, 10), PASSWORD_DEFAULT),
         ]);
         $app = Application::all()->first();
-        $user->applications()->attach($app, ['granted_privilege_version' => $app->privilege_version]);
+        $user->applications()->attach($app, ['granted_privilege_version' => $app->privilege_version, 'external_id' => $user->id]);
     }
 
 }

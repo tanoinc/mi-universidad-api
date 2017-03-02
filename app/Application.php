@@ -35,8 +35,18 @@ class Application extends Model
     {
         return $this->privileges()->wherePivot('version', '=', $this->privilege_version);
     }
+
     public function newsfeeds()
     {
-        return $this->belongsToMany('App\Newsfeed', 'newsfeed_application');
+        return $this->hasMany('App\Newsfeed');
+    }
+    public function global_newsfeeds($union = null)
+    {
+        $q = $this->newsfeeds()->where('global', true)->orderBy('created_at', 'desc');
+        if ($union) {
+            $q->union($union);
+        }
+        return $q;
     }    
+
 }

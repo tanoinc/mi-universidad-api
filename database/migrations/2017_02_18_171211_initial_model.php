@@ -58,8 +58,11 @@ class InitialModel extends Migration
             $table->string('title', 150);
             $table->text('content');
             $table->boolean('send_notification');
+            $table->integer('application_id')->unsigned();
+            $table->boolean('global')->default(true);
             $table->timestamps();
             $table->softDeletes();
+            $table->foreign('application_id')->references('id')->on('application');
         });
         Schema::create('newsfeed_user', function (Blueprint $table) {
             $table->bigIncrements('id');
@@ -69,14 +72,6 @@ class InitialModel extends Migration
             $table->foreign('newsfeed_id')->references('id')->on('newsfeed');
             $table->foreign('user_id')->references('id')->on('user');
         });
-        Schema::create('newsfeed_application', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->bigInteger('newsfeed_id')->unsigned();
-            $table->integer('application_id')->unsigned();
-            $table->timestamps();
-            $table->foreign('newsfeed_id')->references('id')->on('newsfeed');
-            $table->foreign('application_id')->references('id')->on('application');
-        });        
     }
 
     /**
