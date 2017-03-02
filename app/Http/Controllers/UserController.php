@@ -10,6 +10,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\User;
+use App\Exceptions\AlreadyExistsException;
+use App\Application;
 
 /**
  * The User controller class
@@ -18,10 +20,23 @@ use App\User;
  */
 class UserController extends Controller
 {
+    protected function validateCreation(Request $request)
+    {
+        if (User::emailExists($request->get('email'))) {
+            throw (new AlreadyExistsException())->setExtraData('email');
+        }
+        if (User::usernameExists($request->get('username'))) {
+            throw (new AlreadyExistsException())->setExtraData('username');
+        }        
+    }
+
     public function createUser(Request $request)
     {
+        $this->validateCreation($request);
         $user = User::register($request->all());
-
+        $app = Application::findByName('mi-universidad-mobile')->firstOrFail();; // @TODO: Deshardcodear nombre de app
+        $user->applications()->attach($app, ['granted_privilege_version' => $app->privilege_version, 'external_id' => $user->id]);
+        
         return response()->json($user);
     }
 }

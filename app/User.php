@@ -24,7 +24,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     ];
 
     protected $hidden = [
-        'password', 'id',
+        'password', 'id', 'deleted_at'
     ];
     
     public function applications()
@@ -49,8 +49,18 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         $user->hash_id = sha1(random_bytes(8).$user_data['username']);
         $user->password = password_hash($user_data['password'], PASSWORD_DEFAULT);
         $user->email = $user_data['email'];
+        $user->username = $user_data['username'];
         $user->save();
         
         return $user;
     }
+    
+    public static function usernameExists($username)
+    {
+        return User::where('username', '=', $username)->exists();
+    }
+    public static function emailExists($email)
+    {
+        return User::where('email', '=', $email)->exists();
+    }    
 }

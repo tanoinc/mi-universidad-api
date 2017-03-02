@@ -16,7 +16,7 @@ class CreateApplicationsTable extends Migration
     {
         Schema::create('application', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name', 50);
+            $table->string('name', 50)->unique();
             $table->string('description', 255);
             $table->string('token_secret', 100);
             $table->timestamps();

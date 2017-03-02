@@ -40,6 +40,7 @@ class Application extends Model
     {
         return $this->hasMany('App\Newsfeed');
     }
+
     public function global_newsfeeds($union = null)
     {
         $q = $this->newsfeeds()->where('global', true)->orderBy('created_at', 'desc');
@@ -47,6 +48,11 @@ class Application extends Model
             $q->union($union);
         }
         return $q;
-    }    
+    }
+
+    public function scopeFindByName($query, $name)
+    {
+        return $query->where('name', '=', $name);
+    }
 
 }

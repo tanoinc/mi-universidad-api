@@ -45,6 +45,14 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $e)
     {
+        if ($e instanceof GenericErrorException) {
+            return $this->error($e);
+        }
         return parent::render($request, $e);
+    }
+    
+    protected function error(GenericErrorException $e)
+    {
+        return response()->json(['error'=> $e->getErrorCode() , 'message'=> $e->getCustomMessage(), 'data'=>$e->getExtraData()], $e->getStatusCode() );
     }
 }
