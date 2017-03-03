@@ -7,6 +7,7 @@ use Laravel\Lumen\Auth\Authorizable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
+use \Laravel\Passport\HasApiTokens;
 
 /**
  * Represents the "mi-universidad" users.
@@ -15,7 +16,7 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
  */
 class User extends Model implements AuthenticatableContract, AuthorizableContract
 {
-    use Authenticatable, Authorizable;
+    use HasApiTokens, Authenticatable, Authorizable;
     
     protected $table = 'user';
 
@@ -62,5 +63,10 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     public static function emailExists($email)
     {
         return User::where('email', '=', $email)->exists();
-    }    
+    }
+    public function getAuthPassword()
+    {
+        return $this->password;
+    }
+
 }
