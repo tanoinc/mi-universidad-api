@@ -23,7 +23,7 @@ class Application extends Model
         'name', 'description',
     ];
     protected $hidden = [
-        'token_secret',
+        'id', 'deleted_at', 'updated_at'
     ];
 
     public function privileges()

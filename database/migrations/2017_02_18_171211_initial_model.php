@@ -14,10 +14,6 @@ class InitialModel extends Migration
      */
     public function up()
     {
-        Schema::table('application', function(Blueprint $table) {
-            $table->string('application_hash_id', 50)->unique()->after('id');
-            $table->integer('privilege_version')->default(1);
-        });
         Schema::create('privilege', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name', 50)->unique();
@@ -81,10 +77,6 @@ class InitialModel extends Migration
      */
     public function down()
     {
-        Schema::table('application', function (Blueprint $table) {
-            $table->dropColumn('application_hash_id');
-            $table->dropColumn('privilege_version');
-        });
         Schema::dropIfExists('newsfeed_application');
         Schema::dropIfExists('newsfeed_user');
         Schema::dropIfExists('newsfeed');
