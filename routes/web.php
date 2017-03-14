@@ -19,7 +19,7 @@ $app->get('/hola', function () use ($app) {
     return "Hola Mundo!";
 });
 
-$app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers','middleware'=>'auth'], function($app)
+$app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers','middleware'=>'auth_api_key'], function($app)
 {
     // Application
     $app->get('application','ApplicationController@index');
