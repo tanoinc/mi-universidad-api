@@ -25,8 +25,11 @@ class ApiKeyMiddleware
         $auth_data = $this->decodeAuthData($api_key_auth);
         $this->validateMethod($auth_data['method']);
         $auth_content = $this->decodeContent($auth_data['content']);
-        //print_r($auth_content);
-        return $next($request);
+        $secret = $this->retrieveSecret($auth_content['key']);
+        if ($this->isValidRequest($request, $auth_content, $secret)) {
+            return $next($request);
+        }
+        throw new UnauthorizedAccessException();
     }
     
     protected function decodeAuthData($api_key_auth)
@@ -53,5 +56,31 @@ class ApiKeyMiddleware
         {
             throw new UnauthorizedAccessException('Unkonwn auth method.');
         }
+    }
+    
+    protected function isValidRequest($request, $auth_content, $secret)
+    {
+        $content = [
+            'full_url' => $request->fullUrl(),
+            'method' => $request->method(),
+            'input' => $request->all(),
+        ];
+        $content = json_encode($content);
+        $hash = hash_hmac($this->getHmacHashFunction(), $content, $secret);
+        //echo $hash.'; ';
+        //echo $content;
+        
+        return ($hash == $auth_content['signature']);
+    }
+    
+    protected function getHmacHashFunction()
+    {
+        return 'sha256';
+    }
+    
+    protected function retrieveSecret($api_key)
+    {
+        $application = \App\Application::where('api_key', $api_key)->firstOrFail();
+        return $application->api_secret;
     }
 }

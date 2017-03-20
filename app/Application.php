@@ -23,7 +23,7 @@ class Application extends Model
         'name', 'description',
     ];
     protected $hidden = [
-        'id', 'deleted_at', 'updated_at'
+        'id', 'deleted_at', 'updated_at', 'api_secret'
     ];
 
     public function privileges()
@@ -53,6 +53,11 @@ class Application extends Model
     public function scopeFindByName($query, $name)
     {
         return $query->where('name', '=', $name);
+    }
+
+    public function findByApiKey($api_key)
+    {
+        return User::where('api_key', $api_key)->get();
     }
 
 }
