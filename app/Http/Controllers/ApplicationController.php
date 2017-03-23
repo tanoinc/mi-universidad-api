@@ -19,9 +19,10 @@ use Illuminate\Http\Request;
 class ApplicationController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
         $applications = Application::all();
+        //Obtener la aplicacion logueada con $this->application();
 
         return response()->json($applications);
     }
