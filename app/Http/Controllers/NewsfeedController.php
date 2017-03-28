@@ -49,16 +49,4 @@ class NewsfeedController extends Controller
 
         return response()->json('deleted');
     }
-
-    public function updateApplication(Request $request, $id)
-    {
-        $application = Application::findOrFail($id);
-        $application->name = $request->input('name');
-        $application->description = $request->input('description');
-        $application->secret_token = $request->input('secret_token');
-        $application->save();
-
-        return response()->json($application);
-    }
-
 }

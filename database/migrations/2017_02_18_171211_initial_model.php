@@ -49,6 +49,23 @@ class InitialModel extends Migration
             $table->foreign('application_id')->references('id')->on('application');
             $table->foreign('user_id')->references('id')->on('user');
         });
+        
+        Schema::create('context', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('application_id')->unsigned();            
+            $table->string('name', 150);
+            $table->string('description', 255);
+            $table->timestamps();
+            $table->foreign('application_id')->references('id')->on('application');
+        });        
+        Schema::create('context_user_subscription', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->bigInteger('context_id')->unsigned();
+            $table->integer('user_id')->unsigned();
+            $table->timestamps();
+            $table->foreign('context_id')->references('id')->on('context');
+            $table->foreign('user_id')->references('id')->on('user');
+        });
         Schema::create('newsfeed', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('title', 150);
@@ -56,9 +73,11 @@ class InitialModel extends Migration
             $table->boolean('send_notification');
             $table->integer('application_id')->unsigned();
             $table->boolean('global')->default(true);
+            $table->integer('context_id')->unsigned()->nullable();  
             $table->timestamps();
             $table->softDeletes();
             $table->foreign('application_id')->references('id')->on('application');
+            $table->foreign('context_id')->references('id')->on('context');
         });
         Schema::create('newsfeed_user', function (Blueprint $table) {
             $table->bigIncrements('id');
