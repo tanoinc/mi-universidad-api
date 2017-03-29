@@ -28,9 +28,9 @@ class UserTableSeeder extends Seeder
     {
         $hash = 'abc123'; //sha1(random_bytes(8).'admin'); // Comentado para debug
         $user = User::create([
-            'username' => 'admin', 
+            'username' => 'admin@localhost', 
             'hash_id' => $hash, 
-            'email' => '',
+            'email' => 'admin@localhost',
             'password' => password_hash(substr($hash, 0, 10), PASSWORD_DEFAULT),
         ]);
         $app = Application::all()->first();

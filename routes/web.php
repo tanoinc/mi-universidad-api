@@ -15,11 +15,20 @@ $app->get('/', function () use ($app) {
     return "Hola Mundo! '/' ";
 });
 
-$app->get('/hola', function () use ($app) {
-    return "Hola Mundo!";
+// Public
+$app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers'], function($app)
+{
+    $app->get('config/init','ConfigurationController@initialConfig');
 });
 
+// External apps (api-key + sign)
 $app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers','middleware'=>'auth_api_key'], function($app)
+{
+    $app->post('newsfeed','NewsfeedController@createNewsfeed');
+});
+
+// Mobile app (OAuth2)
+$app->group(['prefix' => 'mobile/api/v1','namespace' => '\App\Http\Controllers','middleware'=>'auth'], function($app)
 {
     // Application
     $app->get('application','ApplicationController@index');
@@ -33,7 +42,6 @@ $app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers','middle
     
     // Newsfeed
     $app->get('newsfeed','NewsfeedController@index');
-    $app->post('newsfeed','NewsfeedController@createNewsfeed');
     $app->get('newsfeed/user/{user_hash_id}','NewsfeedController@getFromUser');
     
     // User

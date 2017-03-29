@@ -60,7 +60,7 @@ class InitialModel extends Migration
         });        
         Schema::create('context_user_subscription', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('context_id')->unsigned();
+            $table->integer('context_id')->unsigned();
             $table->integer('user_id')->unsigned();
             $table->timestamps();
             $table->foreign('context_id')->references('id')->on('context');
@@ -99,6 +99,8 @@ class InitialModel extends Migration
         Schema::dropIfExists('newsfeed_application');
         Schema::dropIfExists('newsfeed_user');
         Schema::dropIfExists('newsfeed');
+        Schema::dropIfExists('context_user_subscription');
+        Schema::dropIfExists('context');
         Schema::dropIfExists('user_application');
         Schema::dropIfExists('user');
         Schema::dropIfExists('application_privilege');
