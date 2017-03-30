@@ -12,7 +12,7 @@
 */
 
 $app->get('/', function () use ($app) {
-    return "Hola Mundo! '/' ";
+    return "Hola!";
 });
 
 // Public
@@ -21,8 +21,8 @@ $app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers'], funct
     $app->get('config/init','ConfigurationController@initialConfig');
 });
 
-// External apps (api-key + sign)
-$app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers','middleware'=>'auth_api_key'], function($app)
+// Server-side apps (api-key + signature)
+$app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers','middleware'=>['auth_api_key','check_privileges']], function($app)
 {
     $app->post('newsfeed','NewsfeedController@createNewsfeed');
 });

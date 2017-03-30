@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Exceptions\UnauthorizedAccessException;
 use Closure;
+use Illuminate\Support\Facades\Log;
 
 class ApiKeyMiddleware
 {
@@ -83,6 +84,7 @@ class ApiKeyMiddleware
     protected function isValidRequest($request)
     {
         $hash = hash_hmac($this->getHmacHashFunction(), $this->getHmacContent($request), $this->getApplication()->api_secret);
+        Log::debug(sprintf('Signature: Expected [%s], Received [%s]', $hash, $this->auth_signature));
 
         return ($hash == $this->auth_signature);
     }
@@ -104,7 +106,11 @@ class ApiKeyMiddleware
 
     protected function retrieveApplication($api_key)
     {
-        return \App\Application::where('api_key', $api_key)->firstOrFail();
+        $app = \App\Application::where('api_key', $api_key)->first();
+        if (!$app) {
+            throw new UnauthorizedAccessException('Application not found.');
+        }
+        return $app;
     }
 
 }

@@ -22,7 +22,9 @@ class Newsfeed extends Model
     protected $fillable = [
         'title',
         'content',
-        'send_notification'
+        'send_notification',
+        'global',
+        'context_id',
     ];
     
     protected $hidden = ['pivot'];

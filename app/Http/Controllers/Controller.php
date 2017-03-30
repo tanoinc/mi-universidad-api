@@ -25,5 +25,5 @@ class Controller extends BaseController
     {
         $this->application = $application;
     }
-
+    
 }

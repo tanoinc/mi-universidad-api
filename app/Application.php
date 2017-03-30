@@ -36,6 +36,26 @@ class Application extends Model
         return $this->privileges()->wherePivot('version', '=', $this->privilege_version);
     }
 
+    public function granted_action($controller_action_name)
+    {
+        return $this->granted_privileges()->where('privilege.controller_action', '=', $controller_action_name);
+    }
+
+    public function granted_privilege($privilege_name)
+    {
+        return $this->granted_privileges()->where('privilege.name', '=', $privilege_name);
+    }    
+    
+    public function has_granted_action($controller_action_name)
+    {
+        return $this->granted_action($controller_action_name)->first();
+    }
+
+    public function has_granted_privilege($privilege_name)
+    {
+        return $this->granted_privilege($privilege_name)->first();
+    }
+    
     public function newsfeeds()
     {
         return $this->hasMany('App\Newsfeed');
@@ -57,7 +77,7 @@ class Application extends Model
 
     public function findByApiKey($api_key)
     {
-        return User::where('api_key', $api_key)->get();
+        return static::where('api_key', $api_key)->get();
     }
 
 }

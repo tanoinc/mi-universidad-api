@@ -62,6 +62,7 @@ $app->singleton(
 $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
     'auth_api_key' => \App\Http\Middleware\ApiKeyMiddleware::class,
+    'check_privileges' => App\Http\Middleware\CheckPrivilegeMiddleware::class,
 ]);
 
 // $app->middleware([

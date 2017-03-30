@@ -34,7 +34,7 @@ class UserController extends Controller
     {
         $this->validateCreation($request);
         $user = User::register($request->all());
-        $app = Application::findByName('mi-universidad-mobile')->firstOrFail();; // @TODO: Deshardcodear nombre de app
+        $app = Application::findByName('mi-universidad-mobile')->firstOrFail(); // @TODO: Deshardcodear nombre de app
         $user->applications()->attach($app, ['granted_privilege_version' => $app->privilege_version, 'external_id' => $user->id]);
         
         return response()->json($user);

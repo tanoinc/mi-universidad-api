@@ -2,6 +2,8 @@
 
 namespace App\Exceptions;
 
+use Exception;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -9,22 +11,22 @@ namespace App\Exceptions;
  */
 
 /**
- * Exeption thrown when a request can not be authorized.
+ * Exeption thrown when request cannot access a resource.
  *
  * @author tanoinc
  */
-class UnauthorizedAccessException extends GenericErrorException
+class ForbiddenAccessException extends GenericErrorException
 {
     public function getErrorCode() 
     {
-        return 3;
+        return 4;
     }
     public function getCustomMessage()
     {
-        return trim("Authorization header missing or invalid. ".$this->getMessage());
+        return trim("Forbidden: Not enough privileges. ".$this->getMessage());
     }
     public function getStatusCode()
     {
-        return 401;
+        return 403;
     }
 }

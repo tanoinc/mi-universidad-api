@@ -19,6 +19,15 @@ class Privilege extends Model
     protected $table = 'privilege';
 
     protected $fillable = [
-        'name', 'description',
+        'name', 'description','controller_action'
     ];
+    
+    public function scopeFindByName($query, $name)
+    {
+        return $query->where('name', '=', $name);
+    }
+    public function scopeFindByAction($query, $name)
+    {
+        return $query->where('controller_action', '=', $name);
+    }
 }

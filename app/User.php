@@ -42,7 +42,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     {
         return $query->where('hash_id', '=', $hash_id);
     }
-    
+
     public static function register($user_data)
     {
         $user_data['username'] = $user_data['email'];

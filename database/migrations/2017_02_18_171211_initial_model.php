@@ -18,6 +18,7 @@ class InitialModel extends Migration
             $table->increments('id');
             $table->string('name', 50)->unique();
             $table->string('description', 255);
+            $table->string('controller_action', 255)->nullable();
             $table->timestamps();
         });
         Schema::create('application_privilege', function (Blueprint $table) {

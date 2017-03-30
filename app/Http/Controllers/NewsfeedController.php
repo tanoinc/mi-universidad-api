@@ -11,7 +11,7 @@ namespace App\Http\Controllers;
 use App\Newsfeed;
 use Illuminate\Http\Request;
 use App\User;
-
+use App\UserApplication;
 /**
  * The Newsfeed controller class
  *
@@ -37,16 +37,42 @@ class NewsfeedController extends Controller
 
     public function createNewsfeed(Request $request)
     {
-        $newsfeeds = Newsfeed::create($request->all());
-
-        return response()->json($newsfeeds);
+        $newsfeed = $this->newFromRequest($request);
+        $newsfeed->save();
+        $this->setUsersFromRequest($newsfeed, $request);
+        
+        return response()->json($newsfeed);
     }
-
-    public function deleteApplication($id)
+    
+    protected function newFromRequest(Request $request)
     {
-        $application = Application::findOrFail($id);
-        $application->delete();
-
-        return response()->json('deleted');
+        $newsfeed = new Newsfeed();
+        
+        return $this->setFromRequest($newsfeed, $request);
+    }
+    
+    protected function setUsersFromRequest($newsfeed, Request $request)
+    {
+        $ids = $this->getUsersFromRequest($request)->map(function ($user_app) { return $user_app->user_id; });
+        $newsfeed->users()->attach($ids);
+    }
+    protected function setFromRequest($newsfeed, Request $request)
+    {
+        $newsfeed->application_id = $this->getApplication()->id;
+        $newsfeed->title = $request->input('title');
+        $newsfeed->content = $request->input('content');
+        $newsfeed->send_notification = ($request->input('send_notification')?1:0);
+        $newsfeed->global = ($request->input('global')?1:0);
+        
+        return $newsfeed;
+    }
+    
+    protected function getUsersFromRequest(Request $request)
+    {
+        $app_id = $this->getApplication()->id;
+        if ($request->input('users')) {
+            
+            return UserApplication::findByApplicationAndExternalId( $app_id, $request->input('users') )->get();
+        }
     }
 }
