@@ -12,11 +12,14 @@ use App\Newsfeed;
 use Illuminate\Http\Request;
 use App\User;
 use App\UserApplication;
+use Illuminate\Support\Facades\Auth;
+
 /**
  * The Newsfeed controller class
  *
  * @author tanoinc
  */
+
 class NewsfeedController extends Controller
 {
 
@@ -27,12 +30,23 @@ class NewsfeedController extends Controller
         return response()->json($newsfeed);
     }
 
-    public function getFromUser(Request $request, $user_hash_id)
+    protected function getFromUser(User $user)
     {
-        $user = User::findByHashId($user_hash_id)->firstOrFail();
         $newsfeeds = Newsfeed::getAllFromUser($user)->orderBy('created_at','desc')->simplePaginate(15);
 
         return response()->json($newsfeeds->values());
+    }
+    
+    public function getFromUserHashId(Request $request, $user_hash_id)
+    {
+        $user = User::findByHashId($user_hash_id)->firstOrFail();
+        
+        return $this->getFromUser($user);
+    }
+
+    public function getFromAuthenticatedUser(Request $request)
+    {
+        return $this->getFromUser(Auth::user());
     }
 
     public function createNewsfeed(Request $request)

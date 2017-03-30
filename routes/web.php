@@ -19,31 +19,33 @@ $app->get('/', function () use ($app) {
 $app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers'], function($app)
 {
     $app->get('config/init','ConfigurationController@initialConfig');
+    
+    // User
+    $app->post('user','UserController@createUser');
 });
 
 // Server-side apps (api-key + signature)
 $app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers','middleware'=>['auth_api_key','check_privileges']], function($app)
 {
+    // Newsfeed
     $app->post('newsfeed','NewsfeedController@createNewsfeed');
-});
-
-// Mobile app (OAuth2)
-$app->group(['prefix' => 'mobile/api/v1','namespace' => '\App\Http\Controllers','middleware'=>'auth'], function($app)
-{
+    $app->get('newsfeed/user/{user_hash_id}','NewsfeedController@getFromUserHashId');    
+    
     // Application
     $app->get('application','ApplicationController@index');
     $app->get('application/{id}','ApplicationController@getApplication');
     $app->post('application','ApplicationController@createApplication');
     $app->put('application/{id}','ApplicationController@updateApplication');
     $app->delete('application/{id}','ApplicationController@deleteApplication');
-    
+
     // Application privileges
     $app->get('application/{id}/granted_privileges','ApplicationController@getApplicationGrantedPrivileges');
-    
+});
+
+// Mobile app (OAuth2)
+$app->group(['prefix' => 'mobile/api/v1','namespace' => '\App\Http\Controllers','middleware'=>'auth'], function($app)
+{
     // Newsfeed
     $app->get('newsfeed','NewsfeedController@index');
-    $app->get('newsfeed/user/{user_hash_id}','NewsfeedController@getFromUser');
-    
-    // User
-    $app->post('user','UserController@createUser');
+    $app->get('newsfeed/my','NewsfeedController@getFromUser');
 });
