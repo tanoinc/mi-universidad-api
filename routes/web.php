@@ -47,5 +47,9 @@ $app->group(['prefix' => 'mobile/api/v1','namespace' => '\App\Http\Controllers',
 {
     // Newsfeed
     $app->get('newsfeed','NewsfeedController@index');
-    $app->get('newsfeed/my','NewsfeedController@getFromUser');
+    $app->get('newsfeed/my','NewsfeedController@getFromAuthenticatedUser');
+    $app->post('context/subscription','SubscriptionController@subscribeUser');
+    $app->delete('context/subscription/{application_name}/{context_name}','SubscriptionController@unsubscribeUser');
+    
+    
 });

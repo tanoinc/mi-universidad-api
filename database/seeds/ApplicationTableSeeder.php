@@ -26,8 +26,8 @@ class ApplicationTableSeeder extends Seeder
     public function run()
     {
         $app = Application::create([
-            'name' => 'mi-universidad-mobile',
-            'description' => 'Mi-universidad Mobile app',
+            'name' => env('MOBILE_APP_NAME'),
+            'description' => env('MOBILE_APP_NAME').' mobile app',
             'api_key'  => sha1(random_bytes(8).microtime()),
             'api_secret'  => sha1(random_bytes(8).microtime()),
             'privilege_version' => 1,

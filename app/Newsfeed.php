@@ -46,7 +46,7 @@ class Newsfeed extends Model
                     ->from('newsfeed_user')
                     ->where('user_id', '=', $user->id);
         });
-        $query2= DB::table('newsfeed')->
+        $query2 = DB::table('newsfeed')->
             where('global', '=', true)->
             whereIn('application_id', function($query_in) use ($user) {
                 $query_in->select('application_id')
@@ -54,6 +54,14 @@ class Newsfeed extends Model
                         ->where('user_id', '=', $user->id);
             })
         ->union($query);
+        $query3 = DB::table('newsfeed')->
+            whereIn('context_id', function($query_in) use ($user) {
+                $query_in->select('context_id')
+                        ->from('context_user_subscription')
+                        ->where('user_id', '=', $user->id);
+            });
+        $query2->union($query3);
+
         return $query2;
     }
    
