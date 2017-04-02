@@ -41,6 +41,11 @@ paths:
           description: Indica si la publicación es global a todos los que utilizan la aplicación.
           required: false
           type: boolean
+        - name: context_name
+          in: body
+          description: Contexto de la publicación
+          required: false
+          type: string          
         - name: users
           in: body
           description: Lista de los identificadores de usuario externos.

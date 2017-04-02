@@ -13,6 +13,8 @@ use Illuminate\Http\Request;
 use App\User;
 use App\UserApplication;
 use Illuminate\Support\Facades\Auth;
+use App\Context;
+use App\Application;
 
 /**
  * The Newsfeed controller class
@@ -77,10 +79,23 @@ class NewsfeedController extends Controller
         $newsfeed->content = $request->input('content');
         $newsfeed->send_notification = ($request->input('send_notification')?1:0);
         $newsfeed->global = ($request->input('global')?1:0);
+        if ($request->has('context_name')) {
+            $newsfeed->context_id = $this->getContext($this->getApplication(), $request->input('context_name'))->id;
+        }
         
         return $newsfeed;
     }
     
+    protected function getContext(Application $app, $context_name)
+    {
+        if ($context_name) {
+        
+            return Context::findByName($app, $context_name)->firstOrFail();
+        }
+        
+        return null;
+    }
+
     protected function getUsersFromRequest(Request $request)
     {
         $app_id = $this->getApplication()->id;

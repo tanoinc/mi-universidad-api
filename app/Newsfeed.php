@@ -10,6 +10,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+
 /**
  * The newsfeed model class
  *
@@ -17,8 +18,8 @@ use Illuminate\Support\Facades\DB;
  */
 class Newsfeed extends Model
 {
-    protected $table = 'newsfeed';
 
+    protected $table = 'newsfeed';
     protected $fillable = [
         'title',
         'content',
@@ -26,19 +27,23 @@ class Newsfeed extends Model
         'global',
         'context_id',
     ];
-    
     protected $hidden = ['pivot'];
 
     public function application()
     {
         return $this->hasOne('App\Application');
     }
-    
+
+    public function context()
+    {
+        return $this->hasOne('App\Context');
+    }
+
     public function users()
     {
         return $this->belongsToMany('App\User');
     }
-    
+
     public static function getAllFromUser($user)
     {
         $query = DB::table('newsfeed')->whereIn('id', function($query_in) use ($user) {
@@ -47,22 +52,22 @@ class Newsfeed extends Model
                     ->where('user_id', '=', $user->id);
         });
         $query2 = DB::table('newsfeed')->
-            where('global', '=', true)->
-            whereIn('application_id', function($query_in) use ($user) {
-                $query_in->select('application_id')
-                        ->from('user_application')
-                        ->where('user_id', '=', $user->id);
-            })
-        ->union($query);
+                where('global', '=', true)->
+                whereIn('application_id', function($query_in) use ($user) {
+                    $query_in->select('application_id')
+                    ->from('user_application')
+                    ->where('user_id', '=', $user->id);
+                })
+                ->union($query);
         $query3 = DB::table('newsfeed')->
-            whereIn('context_id', function($query_in) use ($user) {
-                $query_in->select('context_id')
-                        ->from('context_user_subscription')
-                        ->where('user_id', '=', $user->id);
-            });
+                whereIn('context_id', function($query_in) use ($user) {
+            $query_in->select('context_id')
+            ->from('context_user_subscription')
+            ->where('user_id', '=', $user->id);
+        });
         $query2->union($query3);
 
         return $query2;
     }
-   
+
 }
