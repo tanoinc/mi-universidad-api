@@ -38,6 +38,11 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         return $this->belongsToMany('App\Newsfeed')->orderBy('created_at','desc');
     }
     
+    public function contexts()
+    {
+        return $this->belongsToMany('App\Context', 'context_user_subscription');
+    }
+    
     public function scopeFindByHashId($query, $hash_id)
     {
         return $query->where('hash_id', '=', $hash_id);

@@ -21,13 +21,10 @@ class ApplicationController extends Controller
 
     public function index(Request $request)
     {
-        $applications = Application::all();
-        //Obtener la aplicacion logueada con $this->application();
-
-        return response()->json($applications);
+        return response()->json($this->getApplication());
     }
 
-    public function getApplication($id)
+    public function getById($id)
     {
         $application = Application::findOrFail($id);
 

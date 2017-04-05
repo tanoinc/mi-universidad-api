@@ -6,6 +6,7 @@ use App\Context;
 use App\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\User;
 
 class SubscriptionController extends Controller
 {
@@ -32,5 +33,9 @@ class SubscriptionController extends Controller
         
         return response()->json($context);
     }
-
+    
+    protected function getFromUser(User $user)
+    {
+        return response()->json($user->contexts()->simplePaginate(env('ITEMS_PER_PAGE_DEFAULT',20)));
+    }
 }

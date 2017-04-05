@@ -44,7 +44,13 @@ class PrivilegeTableSeeder extends Seeder
             'name' => 'newsfeed:get',
             'description' => 'To get a post from the newsfeed',
             'controller_action' => 'App\Http\Controllers\NewsfeedController@getNewsfeed',
-        ]);         
+        ]);
+        Privilege::create([
+            'name' => 'application:get',
+            'description' => 'Get current authenticated application data',
+            'controller_action' => 'App\Http\Controllers\ApplicationController@index',
+        ]);
+        
     }
 
 }

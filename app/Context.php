@@ -18,7 +18,7 @@ class Context extends Model
         'name', 'description'
     ];
     protected $hidden = [
-        'id', 'deleted_at', 'created_at', 'application_id'
+        'id', 'deleted_at', 'created_at', 'application_id','pivot'
     ];
 
     public function application()
@@ -35,7 +35,7 @@ class Context extends Model
     {
         return $app->contexts()->where('name', '=', $context_name);
     }
-    
+
     public function subscribe(User $user) 
     {
         $this->users()->syncWithoutDetaching([$user->id]);
@@ -44,5 +44,24 @@ class Context extends Model
     public function unsubscribe(User $user) 
     {
         $this->users()->detach($user);
+    }
+    
+    public function setNameAttribute($value)
+    {
+        $this->attributes['name'] = strtolower($value);
+        $this->description = str_replace(array('-','_'),' ', ucfirst(strtolower($value)));
+    }
+    public static function create(Application $app, $context_name)
+    {
+        $context = new Context();
+        $context->name = $context_name;
+        $context->application_id = $app->id;
+        if ($context->save())
+        {
+            
+            return $context;
+        }
+        
+        return null;
     }
 }

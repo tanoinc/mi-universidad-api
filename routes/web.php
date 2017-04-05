@@ -30,10 +30,11 @@ $app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers','middle
     // Newsfeed
     $app->post('newsfeed','NewsfeedController@createNewsfeed');
     $app->get('newsfeed/user/{user_hash_id}','NewsfeedController@getFromUserHashId');    
-    
+    $app->get('newsfeed','NewsfeedController@index');
+
     // Application
     $app->get('application','ApplicationController@index');
-    $app->get('application/{id}','ApplicationController@getApplication');
+    $app->get('application/{id}','ApplicationController@getById');
     $app->post('application','ApplicationController@createApplication');
     $app->put('application/{id}','ApplicationController@updateApplication');
     $app->delete('application/{id}','ApplicationController@deleteApplication');
@@ -46,10 +47,15 @@ $app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers','middle
 $app->group(['prefix' => 'mobile/api/v1','namespace' => '\App\Http\Controllers','middleware'=>'auth'], function($app)
 {
     // Newsfeed
-    $app->get('newsfeed','NewsfeedController@index');
-    $app->get('newsfeed/my','NewsfeedController@getFromAuthenticatedUser');
+    $app->get('newsfeed','NewsfeedController@getFromAuthenticatedUser');
+    
+    // Subscriptions
     $app->post('context/subscription','SubscriptionController@subscribeUser');
     $app->delete('context/subscription/{application_name}/{context_name}','SubscriptionController@unsubscribeUser');
+    $app->get('context/subscriptions','SubscriptionController@getFromAuthenticatedUser');
+    
+    // Contexts
+    $app->get('contexts/{application_name}','ContextController@getByApplication');    
     
     
 });

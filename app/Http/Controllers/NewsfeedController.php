@@ -27,28 +27,16 @@ class NewsfeedController extends Controller
 
     public function index()
     {
-        $newsfeed = Newsfeed::all();
+        $newsfeed = Newsfeed::all()->simplePaginate(env('ITEMS_PER_PAGE_DEFAULT',20));
 
         return response()->json($newsfeed);
     }
 
     protected function getFromUser(User $user)
     {
-        $newsfeeds = Newsfeed::getAllFromUser($user)->orderBy('created_at','desc')->simplePaginate(15);
+        $newsfeeds = Newsfeed::getAllFromUser($user)->orderBy('created_at','desc')->simplePaginate(env('ITEMS_PER_PAGE_DEFAULT',20));
 
-        return response()->json($newsfeeds->values());
-    }
-    
-    public function getFromUserHashId(Request $request, $user_hash_id)
-    {
-        $user = User::findByHashId($user_hash_id)->firstOrFail();
-        
-        return $this->getFromUser($user);
-    }
-
-    public function getFromAuthenticatedUser(Request $request)
-    {
-        return $this->getFromUser(Auth::user());
+        return response()->json($newsfeeds);
     }
 
     public function createNewsfeed(Request $request)
@@ -88,12 +76,12 @@ class NewsfeedController extends Controller
     
     protected function getContext(Application $app, $context_name)
     {
-        if ($context_name) {
-        
-            return Context::findByName($app, $context_name)->firstOrFail();
+        $context = Context::findByName($app, $context_name)->first();
+        if (!$context) {
+            $context = Context::create($app, $context_name);
         }
-        
-        return null;
+
+        return $context;
     }
 
     protected function getUsersFromRequest(Request $request)
