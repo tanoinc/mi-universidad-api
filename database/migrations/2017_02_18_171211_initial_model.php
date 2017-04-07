@@ -58,6 +58,7 @@ class InitialModel extends Migration
             $table->string('description', 255);
             $table->timestamps();
             $table->foreign('application_id')->references('id')->on('application');
+            $table->unique(array('application_id','name'));
         });        
         Schema::create('context_user_subscription', function (Blueprint $table) {
             $table->bigIncrements('id');
@@ -66,6 +67,7 @@ class InitialModel extends Migration
             $table->timestamps();
             $table->foreign('context_id')->references('id')->on('context');
             $table->foreign('user_id')->references('id')->on('user');
+            $table->unique(array('context_id','user_id'));
         });
         Schema::create('newsfeed', function (Blueprint $table) {
             $table->bigIncrements('id');
