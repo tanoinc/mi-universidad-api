@@ -63,12 +63,13 @@ $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
     'auth_api_key' => \App\Http\Middleware\ApiKeyMiddleware::class,
     'check_privileges' => App\Http\Middleware\CheckPrivilegeMiddleware::class,
-    'cors' => App\Http\Middleware\CorsMiddleware::class,
+//    'cors' => App\Http\Middleware\CorsMiddleware::class,
 ]);
 
-// $app->middleware([
-//    App\Http\Middleware\ExampleMiddleware::class
-// ]);
+$app->middleware([
+    App\Http\Middleware\CorsMiddleware::class,
+//   App\Http\Middleware\ExampleMiddleware::class
+]);
 
 // $app->routeMiddleware([
 //     'auth' => App\Http\Middleware\Authenticate::class,
@@ -89,7 +90,6 @@ $app->register(Laravel\Passport\PassportServiceProvider::class);
 $app->register(Dusterio\LumenPassport\PassportServiceProvider::class);
 
 $app->register(App\Providers\AuthServiceProvider::class);
-$app->register(App\Providers\CatchAllOptionsRequestsProvider::class);
 
 // $app->register(App\Providers\EventServiceProvider::class);
 
