@@ -16,7 +16,7 @@ $app->get('/', function () use ($app) {
 });
 
 // Public
-$app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers','middleware'=>['cors']], function($app)
+$app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers'], function($app)
 {
     $app->get('config/init','ConfigurationController@initialConfig');
     
@@ -44,7 +44,7 @@ $app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers','middle
 });
 
 // Mobile app (OAuth2)
-$app->group(['prefix' => 'mobile/api/v1','namespace' => '\App\Http\Controllers','middleware'=>['auth','cors']], function($app)
+$app->group(['prefix' => 'mobile/api/v1','namespace' => '\App\Http\Controllers','middleware'=>['auth']], function($app)
 {
     // Newsfeed
     $app->get('newsfeed','NewsfeedController@getFromAuthenticatedUser');

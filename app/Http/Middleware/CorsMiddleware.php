@@ -7,19 +7,21 @@ namespace App\Http\Middleware;
 class CorsMiddleware
 {
 
-    public function handle($request, \Closure $next)
+    public function handle(\Symfony\Component\HttpFoundation\Request $request, \Closure $next)
     {
         //https://gist.github.com/danharper/06d2386f0b826b669552#gistcomment-2013919
         //Intercepts OPTIONS requests
+        \Illuminate\Support\Facades\Log::debug(str_replace("\n", "", $request->getContent()));
         if ($request->isMethod('OPTIONS')) {
             $response = response('', 200);
         } else {
             // Pass the request to the next middleware
             $response = $next($request);
         }
-        $response->header('Access-Control-Allow-Methods', 'HEAD, GET, POST, PUT, PATCH, DELETE');
-        $response->header('Access-Control-Allow-Headers', $request->header('Access-Control-Request-Headers'));
-        $response->header('Access-Control-Allow-Origin', '*');
+        //Modified to support Symfony's Response class (from Passport plugin)
+        $response->headers->set('Access-Control-Allow-Methods', 'HEAD, GET, POST, PUT, PATCH, DELETE');
+        $response->headers->set('Access-Control-Allow-Headers', $request->header('Access-Control-Request-Headers'));
+        $response->headers->set('Access-Control-Allow-Origin', '*');        
         return $response;
     }
 
