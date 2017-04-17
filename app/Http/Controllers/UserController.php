@@ -27,7 +27,7 @@ class UserController extends Controller
             'username' => 'required|alpha_dash|unique:user|max:255',
             'name' => 'required|max:255',
             'surname' => 'required|max:255',
-            'password' => 'required|max:255',
+            'password' => 'required|min:8|max:255',
         ];
     }
 
