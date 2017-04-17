@@ -6,6 +6,8 @@ use Laravel\Lumen\Routing\Controller as BaseController;
 use \Illuminate\Http\Request;
 use App\User;
 use Illuminate\Support\Facades\Auth;
+use App\Exceptions\CustomValidationException;
+use Illuminate\Validation\ValidationException;
 
 class Controller extends BaseController
 {
@@ -45,4 +47,14 @@ class Controller extends BaseController
         return $this->getFromUser(Auth::user());
     }
     
+    public function validate(Request $request, array $rules, array $messages = array(), array $customAttributes = array())
+    {
+        try {
+            parent::validate($request, $rules, $messages, $customAttributes);
+        }
+        catch (ValidationException $e) {
+            throw new CustomValidationException($e);
+        }
+    }
+
 }

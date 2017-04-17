@@ -34,6 +34,8 @@ class InitialModel extends Migration
             $table->increments('id');
             $table->string('username', 255)->unique();
             $table->string('password', 255);
+            $table->string('name', 255);
+            $table->string('surname', 255);
             $table->string('email', 255)->unique();
             $table->string('hash_id', 100)->unique();
             $table->timestamps();

@@ -10,7 +10,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\User;
-use App\Exceptions\AlreadyExistsException;
 use App\Application;
 
 /**
@@ -20,23 +19,26 @@ use App\Application;
  */
 class UserController extends Controller
 {
-    protected function validateCreation(Request $request)
+
+    protected function getCreationConstraints()
     {
-        if (User::emailExists($request->get('email'))) {
-            throw (new AlreadyExistsException())->setExtraData('email');
-        }
-        if (User::usernameExists($request->get('username'))) {
-            throw (new AlreadyExistsException())->setExtraData('username');
-        }        
+        return [
+            'email' => 'required|email|unique:user|max:255',
+            'username' => 'required|alpha_dash|unique:user|max:255',
+            'name' => 'required|max:255',
+            'surname' => 'required|max:255',
+            'password' => 'required|max:255',
+        ];
     }
 
     public function createUser(Request $request)
     {
-        $this->validateCreation($request);
-        $user = User::register($request->all());
+        $this->validate($request, $this->getCreationConstraints());
+        $user = User::registerByData($request->all());
         $app = Application::findByName(env('MOBILE_APP_NAME'))->firstOrFail();
         $user->applications()->attach($app, ['granted_privilege_version' => $app->privilege_version, 'external_id' => $user->id]);
-        
+
         return response()->json($user);
     }
+
 }

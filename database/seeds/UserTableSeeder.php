@@ -28,6 +28,8 @@ class UserTableSeeder extends Seeder
     {
         $hash = 'abc123'; //sha1(random_bytes(8).'admin'); // Comentado para debug
         $user = User::create([
+            'name' => 'Admin',
+            'surnamename' => 'Admin',
             'username' => 'admin@localhost', 
             'hash_id' => $hash, 
             'email' => 'admin@localhost',
