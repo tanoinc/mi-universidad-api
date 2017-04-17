@@ -11,7 +11,7 @@ class CorsMiddleware
     {
         //https://gist.github.com/danharper/06d2386f0b826b669552#gistcomment-2013919
         //Intercepts OPTIONS requests
-        \Illuminate\Support\Facades\Log::debug(str_replace("\n", "", $request->getContent()));
+        //\Illuminate\Support\Facades\Log::debug(str_replace("\n", "", strval($request->getBasePath())));
         if ($request->isMethod('OPTIONS')) {
             $response = response('', 200);
         } else {
