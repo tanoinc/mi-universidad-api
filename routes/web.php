@@ -57,5 +57,6 @@ $app->group(['prefix' => 'mobile/api/v1','namespace' => '\App\Http\Controllers',
     // Contexts
     $app->get('contexts/{application_name}','ContextController@getByApplication');    
     
-    
+    // User
+    $app->get('user','UserController@getFromAuthenticatedUser');    
 });
