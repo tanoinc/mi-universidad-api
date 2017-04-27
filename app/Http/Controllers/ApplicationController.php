@@ -10,6 +10,7 @@ namespace App\Http\Controllers;
 
 use \App\Application;
 use Illuminate\Http\Request;
+use App\User;
 
 /**
  * Description of ApplicationController
@@ -64,4 +65,11 @@ class ApplicationController extends Controller
         return response()->json($application);
     }
 
+    protected function getFromUser(User $user)
+    {
+        $applications = $user->applications()->simplePaginate(env('ITEMS_PER_PAGE_DEFAULT',20));
+
+        return response()->json($applications);
+    }    
+    
 }

@@ -46,6 +46,10 @@ $app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers','middle
 // Mobile app (OAuth2)
 $app->group(['prefix' => 'mobile/api/v1','namespace' => '\App\Http\Controllers','middleware'=>['auth']], function($app)
 {
+    // Applications
+    $app->get('application','ApplicationController@getFromAuthenticatedUser');
+    $app->get('application/available','ApplicationController@getFromAuthenticatedUser');
+    
     // Newsfeed
     $app->get('newsfeed','NewsfeedController@getFromAuthenticatedUser');
     
