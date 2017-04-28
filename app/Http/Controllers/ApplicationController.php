@@ -70,6 +70,13 @@ class ApplicationController extends Controller
         $applications = $user->applications()->simplePaginate(env('ITEMS_PER_PAGE_DEFAULT',20));
 
         return response()->json($applications);
-    }    
+    }
     
+    public function getAvailable(Request $request)
+    {
+        $search_value = $this->getSearchValue();
+        $applications = Application::search($search_value)->paginate(env('ITEMS_PER_PAGE_DEFAULT',20));
+
+        return response()->json($applications);
+    }    
 }

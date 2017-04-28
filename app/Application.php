@@ -23,7 +23,7 @@ class Application extends Model
         'name', 'description',
     ];
     protected $hidden = [
-        'id', 'deleted_at', 'updated_at', 'api_secret'
+        'id', 'api_key', 'deleted_at', 'updated_at', 'api_secret', 'pivot'
     ];
 
     public function privileges()
@@ -44,8 +44,8 @@ class Application extends Model
     public function granted_privilege($privilege_name)
     {
         return $this->granted_privileges()->where('privilege.name', '=', $privilege_name);
-    }    
-    
+    }
+
     public function has_granted_action($controller_action_name)
     {
         return $this->granted_action($controller_action_name)->first();
@@ -55,7 +55,7 @@ class Application extends Model
     {
         return $this->granted_privilege($privilege_name)->first();
     }
-    
+
     public function newsfeeds()
     {
         return $this->hasMany('App\Newsfeed');
@@ -65,7 +65,7 @@ class Application extends Model
     {
         return $this->hasMany('App\Context');
     }
-    
+
     public function global_newsfeeds($union = null)
     {
         $q = $this->newsfeeds()->where('global', true)->orderBy('created_at', 'desc');
@@ -83,6 +83,11 @@ class Application extends Model
     public function findByApiKey($api_key)
     {
         return static::where('api_key', $api_key)->get();
+    }
+
+    public function scopeSearch($query, $value)
+    {
+        return $query->where('name', 'LIKE', "%$value%");
     }
 
 }

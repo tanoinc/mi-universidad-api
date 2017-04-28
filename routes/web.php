@@ -48,7 +48,7 @@ $app->group(['prefix' => 'mobile/api/v1','namespace' => '\App\Http\Controllers',
 {
     // Applications
     $app->get('application','ApplicationController@getFromAuthenticatedUser');
-    $app->get('application/available','ApplicationController@getFromAuthenticatedUser');
+    $app->get('application/available','ApplicationController@getAvailable');
     
     // Newsfeed
     $app->get('newsfeed','NewsfeedController@getFromAuthenticatedUser');

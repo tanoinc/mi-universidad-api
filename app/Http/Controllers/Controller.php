@@ -56,5 +56,14 @@ class Controller extends BaseController
             throw new CustomValidationException($e);
         }
     }
+    
+    protected function getSearchValue() 
+    {
+        $search_value = null;
+        if ($this->request->has('search')) {
+            $search_value = $this->request->get('search');
+        }
+        return $search_value; 
+    }
 
 }
