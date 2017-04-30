@@ -91,5 +91,6 @@ class NewsfeedController extends Controller
             
             return UserApplication::findByApplicationAndExternalId( $app_id, $request->input('users') )->get();
         }
+        return new \Illuminate\Support\Collection([]);
     }
 }
