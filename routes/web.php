@@ -57,6 +57,7 @@ $app->group(['prefix' => 'mobile/api/v1','namespace' => '\App\Http\Controllers',
     $app->post('context/subscription','SubscriptionController@subscribeUser');
     $app->delete('context/subscription/{application_name}/{context_name}','SubscriptionController@unsubscribeUser');
     $app->get('context/subscriptions','SubscriptionController@getFromAuthenticatedUser');
+    $app->get('context/subscriptions/{application_name}','SubscriptionController@getByAppNameFromAuthenticatedUser');
     
     // Contexts
     $app->get('contexts/{application_name}','ContextController@getByApplication');    

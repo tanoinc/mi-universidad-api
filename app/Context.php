@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use App\User;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Represents the "mi-universidad" contexts related to contextual modules.
@@ -73,6 +74,19 @@ class Context extends Model
                             $q->where('name', 'LIKE', "%$value%")
                             ->orWhere('description', 'LIKE', "%$value%");
                         });
+    }
+
+    public static function findByAppAndUser($app_name, \App\User $user)
+    {
+        $query = DB::table('context')
+                ->select('context.name', 'context.description', 'application.name AS application_name', 'context_user_subscription.created_at')
+                ->join('application', 'application.id', 'context.application_id')
+                ->join('context_user_subscription', 'context_user_subscription.context_id', 'context.id')
+                ->join('user', 'user.id', 'context_user_subscription.user_id')
+                ->where('application.name', $app_name)
+                ->where('user.id', $user->id);
+
+        return $query;
     }
 
 }

@@ -12,6 +12,7 @@ class SubscriptionController extends Controller
 {
     protected function getContext($application_name, $context_name, &$app = null)
     {
+        \Illuminate\Support\Facades\Log::debug(sprintf('trying to delete context: [%s], [%s]', $application_name, $context_name));
         $app = Application::findByName($application_name)->firstOrFail();
         return Context::findByName($app, $context_name)->firstOrFail();
     }
@@ -36,6 +37,12 @@ class SubscriptionController extends Controller
     
     protected function getFromUser(User $user)
     {
-        return response()->json($user->contexts()->simplePaginate(env('ITEMS_PER_PAGE_DEFAULT',20)));
+        return response()->json($user->contexts()->with('application')->simplePaginate(env('ITEMS_PER_PAGE_DEFAULT',20)));
     }
+    
+    public function getByAppNameFromAuthenticatedUser(Request $request, $application_name)
+    {
+        $contexts = Context::findByAppAndUser($application_name, Auth::user()); //
+        return response()->json($contexts->get());
+    }    
 }
