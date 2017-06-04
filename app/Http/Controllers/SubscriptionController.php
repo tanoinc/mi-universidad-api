@@ -12,7 +12,7 @@ class SubscriptionController extends Controller
 {
     protected function getContext($application_name, $context_name, &$app = null)
     {
-        \Illuminate\Support\Facades\Log::debug(sprintf('trying to delete context: [%s], [%s]', $application_name, $context_name));
+        \Illuminate\Support\Facades\Log::debug(sprintf('Retrieving context context: [%s], [%s]', $application_name, $context_name));
         $app = Application::findByName($application_name)->firstOrFail();
         return Context::findByName($app, $context_name)->firstOrFail();
     }

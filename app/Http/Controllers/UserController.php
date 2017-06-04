@@ -41,10 +41,18 @@ class UserController extends Controller
         return response()->json($user);
     }
     
-    
     public function getFromUser(User $user)
     {
         return $user;
+    }
+
+    public function registerPushToken(Request $request)
+    {
+        $push_token = new \App\UserPushToken();
+        $push_token->token = $request->input('token');
+        $push_token->type = $request->input('type');
+        $push_token->user()->associate(\Illuminate\Support\Facades\Auth::user() );
+        $push_token->save();
     }
 
 }

@@ -45,6 +45,11 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         return $this->belongsToMany('App\Context', 'context_user_subscription');
     }
 
+    public function pushTokens()
+    {
+        return $this->hasMany('App\UserPushToken');
+    }
+
     public function scopeFindByHashId($query, $hash_id)
     {
         return $query->where('hash_id', '=', $hash_id);

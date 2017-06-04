@@ -63,5 +63,6 @@ $app->group(['prefix' => 'mobile/api/v1','namespace' => '\App\Http\Controllers',
     $app->get('contexts/{application_name}','ContextController@getByApplication');    
     
     // User
-    $app->get('user','UserController@getFromAuthenticatedUser');    
+    $app->get('user','UserController@getFromAuthenticatedUser');
+    $app->post('user/push_token','UserController@registerPushToken');     
 });
