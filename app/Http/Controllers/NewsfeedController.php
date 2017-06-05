@@ -12,7 +12,6 @@ use App\Newsfeed;
 use Illuminate\Http\Request;
 use App\User;
 use App\UserApplication;
-use Illuminate\Support\Facades\Auth;
 use App\Context;
 use App\Application;
 
@@ -44,8 +43,13 @@ class NewsfeedController extends Controller
         $newsfeed = $this->newFromRequest($request);
         $newsfeed->save();
         $this->setUsersFromRequest($newsfeed, $request);
+        $this->sendNotifications();
         
         return response()->json($newsfeed);
+    }
+    
+    protected function sendNotifications() {
+        //IonicApiV2::
     }
     
     protected function newFromRequest(Request $request)

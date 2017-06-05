@@ -91,6 +91,7 @@ $app->register(Dusterio\LumenPassport\PassportServiceProvider::class);
 
 $app->register(App\Providers\AuthServiceProvider::class);
 
+$app->register(App\Providers\IonicApiServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 
 /*
