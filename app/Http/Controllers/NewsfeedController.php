@@ -14,6 +14,7 @@ use App\User;
 use App\UserApplication;
 use App\Context;
 use App\Application;
+use App\Library\IonicApiV2;
 
 /**
  * The Newsfeed controller class
@@ -38,18 +39,33 @@ class NewsfeedController extends Controller
         return response()->json($newsfeeds);
     }
 
-    public function createNewsfeed(Request $request)
+    public function createNewsfeed(Request $request, IonicApiV2 $ionic)
     {
         $newsfeed = $this->newFromRequest($request);
         $newsfeed->save();
         $this->setUsersFromRequest($newsfeed, $request);
-        $this->sendNotifications();
+        $notification = null;
+        if ($newsfeed->send_notification) {
+            $notification = $this->sendNotifications($ionic, $newsfeed);
+        }
         
-        return response()->json($newsfeed);
+        return response()->json(['newsfeed' => $newsfeed, 'push_notification_id' => $notification]);
     }
     
-    protected function sendNotifications() {
-        //IonicApiV2::
+    protected function sendNotifications(IonicApiV2 $ionic, Newsfeed $newsfeed) {
+        $recipients = array();
+        if ($newsfeed->isMobileAppGlobal()) {
+            $recipients = IonicApiV2::RECIPIENT_ALL;
+        } else {
+            foreach ($newsfeed->getUsersForNotification() as $user) {
+                foreach ($user->pushTokens()->get() as $token) {
+                    if ($token->token != '')
+                        $recipients[] = $token->token;
+                }
+            }
+        }
+        
+        return $ionic->sendPushNotification($recipients, $newsfeed->title, $newsfeed->content );
     }
     
     protected function newFromRequest(Request $request)
@@ -64,7 +80,7 @@ class NewsfeedController extends Controller
         $ids = $this->getUsersFromRequest($request)->map(function ($user_app) { return $user_app->user_id; });
         $newsfeed->users()->attach($ids);
     }
-    protected function setFromRequest($newsfeed, Request $request)
+    protected function setFromRequest(Newsfeed $newsfeed, Request $request)
     {
         $newsfeed->application_id = $this->getApplication()->id;
         $newsfeed->title = $request->input('title');

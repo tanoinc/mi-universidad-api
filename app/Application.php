@@ -36,6 +36,11 @@ class Application extends Model
         return $this->privileges()->wherePivot('version', '=', $this->privilege_version);
     }
 
+    public function users()
+    {
+        return $this->belongsToMany('App\User', 'user_application');
+    }
+    
     public function granted_action($controller_action_name)
     {
         return $this->granted_privileges()->where('privilege.controller_action', '=', $controller_action_name);

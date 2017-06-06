@@ -16,6 +16,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Privilege extends Model
 {
+    const NEWSFEED_SEND_NOTIFICATION = 'newsfeed:send_notification';
+    
     protected $table = 'privilege';
 
     protected $fillable = [

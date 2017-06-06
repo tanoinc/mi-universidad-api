@@ -12,6 +12,8 @@ use Illuminate\Support\ServiceProvider;
  */
 class IonicApiServiceProvider extends ServiceProvider
 {
+    protected $defer = true;
+    
     /**
      * Register any application services.
      *

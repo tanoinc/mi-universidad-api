@@ -27,16 +27,18 @@ class Newsfeed extends Model
         'global',
         'context_id',
     ];
-    protected $hidden = ['pivot'];
+    protected $hidden = ['pivot', 'application_id'];
+    
+    protected $users_notification = null;
 
     public function application()
     {
-        return $this->hasOne('App\Application');
+        return $this->belongsTo('App\Application');
     }
 
     public function context()
     {
-        return $this->hasOne('App\Context');
+        return $this->belongsTo('App\Context');
     }
 
     public function users()
@@ -44,6 +46,37 @@ class Newsfeed extends Model
         return $this->belongsToMany('App\User');
     }
 
+    public function isMobileAppGlobal()
+    {
+        return false; // @TODO: verificar que la aplicacions sea la movil y que la notificacion sea global
+    }
+    
+    public function getUsersForNotification()
+    {
+        if ($this->users_notification != null) {
+            return $this->users_notification;
+        }
+        $this->users_notification = [];
+        if ($this->send_notification and $application = $this->application()) {
+            // @TODO: verificar que la version de los privilegios sea la misma que la version aceptada por el usuario.
+            // if appliction has the privilege to send notifications
+            if ($application->first()->has_granted_privilege(Privilege::NEWSFEED_SEND_NOTIFICATION) ) { 
+                if ($this->global) {
+                    // All application's users
+                    $this->users_notification = $application->users()->get();
+                } else {
+                    // Specific notification recipients (private)
+                    $this->users_notification = $this->users()->get();
+                }
+                if ($context = $this->context()->first()) {
+                    // All context subscribed users
+                    $this->users_notification = $this->users_notification->merge( $context->users()->get() );
+                }
+            }
+        }
+        return $this->users_notification;
+    }
+    
     public static function getAllFromUser($user)
     {
         $query = DB::table('newsfeed')

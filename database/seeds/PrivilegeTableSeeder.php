@@ -50,7 +50,11 @@ class PrivilegeTableSeeder extends Seeder
             'description' => 'Get current authenticated application data',
             'controller_action' => 'App\Http\Controllers\ApplicationController@index',
         ]);
-        
+        Privilege::create([
+            'name' => 'newsfeed:send_notification',
+            'description' => 'Send push notifictions to users mobile app',
+            'controller_action' => 'App\Http\Controllers\NewsfeedController@createNewsfeed'
+        ]);
     }
 
 }

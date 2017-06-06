@@ -56,12 +56,16 @@ class IonicApiV2
         }
         $res = $this->http_client->request('POST', 'push/notifications', ['headers' => $this->getHeaders(), 'body' => json_encode($body)]);
         
-        return static::decodeBody( $res->getHeaderLine('Content-Type'), $res->getBody() );
+        $notification = static::decodeBody( $res->getHeaderLine('Content-Type'), $res->getBody() );
+        if ($notification->meta->status >= 200 and $notification->meta->status <= 299) {
+            return $notification->data->uuid;
+        }
+        throw new \App\Exceptions\PushNotificationException();
     }
     
     protected static function decodeBody($content_type, $body) 
     {
-        if ($content_type == 'application/json; charset=utf8') {
+        if ($content_type == 'application/json; charset=utf-8') {
             return json_decode($body);
         } else {
             throw new \App\Exceptions\ContentTypeDecodingException();
