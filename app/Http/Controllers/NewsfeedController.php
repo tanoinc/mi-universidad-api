@@ -15,6 +15,7 @@ use App\UserApplication;
 use App\Context;
 use App\Application;
 use App\Library\IonicApiV2;
+use App\Notification;
 
 /**
  * The Newsfeed controller class
@@ -34,7 +35,7 @@ class NewsfeedController extends Controller
 
     protected function getFromUser(User $user)
     {
-        $newsfeeds = Newsfeed::getAllFromUser($user)->orderBy('created_at','desc')->simplePaginate(env('ITEMS_PER_PAGE_DEFAULT',20));
+        $newsfeeds = Newsfeed::fromUser($user)->orderBy('created_at','desc')->simplePaginate(env('ITEMS_PER_PAGE_DEFAULT',20));
 
         return response()->json($newsfeeds);
     }
@@ -44,28 +45,44 @@ class NewsfeedController extends Controller
         $newsfeed = $this->newFromRequest($request);
         $newsfeed->save();
         $this->setUsersFromRequest($newsfeed, $request);
-        $notification = null;
+        $notifications = null;
         if ($newsfeed->send_notification) {
-            $notification = $this->sendNotifications($ionic, $newsfeed);
+            $notifications = $this->sendNotifications($ionic, $newsfeed);
+            $newsfeed->notifications()->saveMany($notifications);
         }
         
-        return response()->json(['newsfeed' => $newsfeed, 'push_notification_id' => $notification]);
+        return response()->json(['newsfeed' => $newsfeed, 'notification_push_data_uuid' => $notifications[0]->push_data_uuid ]);
     }
     
     protected function sendNotifications(IonicApiV2 $ionic, Newsfeed $newsfeed) {
-        $recipients = array();
-        if ($newsfeed->isMobileAppGlobal()) {
+        $notifications = [];
+        $recipients = $newsfeed->getUsersForNotification();
+        if (Notification::NOTIFY_ALL_USERS == $recipients) {
             $recipients = IonicApiV2::RECIPIENT_ALL;
+            $notifications[] = static::newNotification(null);
         } else {
-            foreach ($newsfeed->getUsersForNotification() as $user) {
-                foreach ($user->pushTokens()->get() as $token) {
-                    if ($token->token != '')
-                        $recipients[] = $token->token;
-                }
+            foreach ($recipients as $user) {
+                $notifications[] = static::newNotification($user);
             }
         }
+        try {
+            $push_data_uuid = $ionic->sendPushNotification($recipients, $newsfeed->title, $newsfeed->content );
+            foreach ($notifications as $notification ) {
+                $notification->push_data_uuid = $push_data_uuid;
+            }
+        } catch (App\Exceptions\PushNotificationException $e) {
+            // @TODO: Loguear la excepcion. Guardar "el hecho" que la notificacion no fue enviada.
+        }
+
+        return $notifications;
+    }
+    
+    protected static function newNotification(User $user) 
+    {
+        $notification = new Notification();
+        $notification->user()->associate($user);
         
-        return $ionic->sendPushNotification($recipients, $newsfeed->title, $newsfeed->content );
+        return $notification;
     }
     
     protected function newFromRequest(Request $request)

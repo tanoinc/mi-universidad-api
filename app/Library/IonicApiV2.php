@@ -39,6 +39,18 @@ class IonicApiV2
         ];
     }
 
+    protected static function usersToTokens($users) {
+        $tokens = [];
+        foreach ($users as $user) {
+            foreach ($user->pushTokens()->get() as $token) {
+                if ($token->token != '')
+                    $tokens[] = $token->token;
+            }
+        }
+
+        return $tokens;
+    }
+    
     public function sendPushNotification($recipients, $title, $message)
     {
         $body = [
@@ -52,7 +64,11 @@ class IonicApiV2
         if ($recipients == static::RECIPIENT_ALL) {
             $body['send_to_all'] = true;
         } else {
-            $body['tokens'] = $recipients;
+            $body['tokens'] = static::usersToTokens($recipients);
+        }
+        if (!env('PUSH_NOTIFICATIONS_ENABLED', false))
+        {
+            return 'push-notifications-disabled';
         }
         $res = $this->http_client->request('POST', 'push/notifications', ['headers' => $this->getHeaders(), 'body' => json_encode($body)]);
         

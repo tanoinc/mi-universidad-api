@@ -27,7 +27,7 @@ class Newsfeed extends Model
         'global',
         'context_id',
     ];
-    protected $hidden = ['pivot', 'application_id'];
+    protected $hidden = ['pivot', 'application_id', 'context_id'];
     
     protected $users_notification = null;
 
@@ -45,7 +45,12 @@ class Newsfeed extends Model
     {
         return $this->belongsToMany('App\User');
     }
-
+    
+    public function notifications()
+    {
+        return $this->morphMany('App\Notification', 'notifiable');
+    }
+    
     public function isMobileAppGlobal()
     {
         return false; // @TODO: verificar que la aplicacions sea la movil y que la notificacion sea global
@@ -54,6 +59,10 @@ class Newsfeed extends Model
     public function getUsersForNotification()
     {
         if ($this->users_notification != null) {
+            return $this->users_notification;
+        }
+        if ( $this->isMobileAppGlobal() ) {
+            $this->users_notification = Notification::NOTIFY_ALL_USERS;
             return $this->users_notification;
         }
         $this->users_notification = [];
@@ -77,7 +86,7 @@ class Newsfeed extends Model
         return $this->users_notification;
     }
     
-    public static function getAllFromUser($user)
+    public static function fromUser($user)
     {
         $query = DB::table('newsfeed')
             ->select('newsfeed.*','application.description AS application_description', 'context.name as context_name','context.description as context_description')
