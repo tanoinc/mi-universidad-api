@@ -67,5 +67,6 @@ $app->group(['prefix' => 'mobile/api/v1','namespace' => '\App\Http\Controllers',
     
     // User
     $app->get('user','UserController@getFromAuthenticatedUser');
-    $app->post('user/push_token','UserController@registerPushToken');     
+    $app->post('user/push_token','UserController@registerPushToken');
+    $app->delete('user/push_token/{type}/{token}','UserController@unregisterPushToken');
 });

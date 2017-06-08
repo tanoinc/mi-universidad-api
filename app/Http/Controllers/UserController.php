@@ -11,6 +11,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\User;
 use App\Application;
+use Illuminate\Support\Facades\Auth;
+use App\UserPushToken;
 
 /**
  * The User controller class
@@ -40,7 +42,7 @@ class UserController extends Controller
 
         return response()->json($user);
     }
-    
+
     public function getFromUser(User $user)
     {
         return $user;
@@ -48,11 +50,23 @@ class UserController extends Controller
 
     public function registerPushToken(Request $request)
     {
-        $push_token = new \App\UserPushToken();
-        $push_token->token = $request->input('token');
-        $push_token->type = $request->input('type');
-        $push_token->user()->associate(\Illuminate\Support\Facades\Auth::user() );
-        $push_token->save();
+        $push_token = UserPushToken::updateOrCreate([
+            'token' => $request->input('token'),
+            'type' => $request->input('type')
+            ], [
+            'user_id' => Auth::user()->id,
+        ]);
+    }
+
+    public function unregisterPushToken(Request $request)
+    {
+        $token = UserPushToken::where('token', $request->input('token'))
+            ->where('type', $request->input('type'))
+            ->where('user_id', Auth::user()->id)->firstOrFail();
+        
+        $token->delete();
+        
+        return $token;
     }
 
 }
