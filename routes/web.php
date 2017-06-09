@@ -20,6 +20,8 @@ $app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers'], funct
 {
     $app->get('config/init','ConfigurationController@initialConfig');
     
+    $app->get('config/service_status','ConfigurationController@serviceStatus');
+    
     // User
     $app->post('user','UserController@createUser');
 });
