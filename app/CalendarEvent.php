@@ -13,32 +13,33 @@ namespace App;
  *
  * @author tanoinc
  */
-class Newsfeed extends AbstractInformation
+class CalendarEvent extends AbstractInformation
 {
 
-    const TABLE_NAME = 'newsfeed';
-    
+    const TABLE_NAME = 'calendar_event';
+
     protected $fillable = [
-        'title',
-        'content',
+        'event_name',
+        'event_date',
+        'event_duration',
         'send_notification',
         'global',
         'context_id',
     ];
-    
+
     protected function getPrivilegeSendNotification()
     {
-        return Privilege::NEWSFEED_SEND_NOTIFICATION;
+        return Privilege::CALENDAR_EVENT_SEND_NOTIFICATION;
     }
 
     public function getNotificationContent()
     {
-        return $this->content;
+        return $this->event_name;
     }
 
     public function getNotificationTitle()
     {
-        return $this->title;
+        return $this->event_date;
     }
 
 }

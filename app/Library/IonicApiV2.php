@@ -51,7 +51,7 @@ class IonicApiV2
         return $tokens;
     }
     
-    public function sendPushNotification($recipients, $title, $message)
+    public function sendPushNotification($recipients, $title, $message, $payload = null)
     {
         $body = [
             //"tokens" => ["your", "device", "tokens"],
@@ -59,12 +59,16 @@ class IonicApiV2
             "notification" => [
                 "title" => $title,
                 "message" => $message,
+                "payload" => $payload,
             ]
         ];
         if ($recipients == static::RECIPIENT_ALL) {
             $body['send_to_all'] = true;
         } else {
             $body['tokens'] = static::usersToTokens($recipients);
+            if (empty($body['tokens'])) {
+                return 'push-notifications-without-tokens';
+            }
         }
         if (!env('PUSH_NOTIFICATIONS_ENABLED', false))
         {

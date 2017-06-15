@@ -25,36 +25,42 @@ class PrivilegeTableSeeder extends Seeder
      */
     public function run()
     {
-        Privilege::create([
-            'name' => 'newsfeed:post',
-            'description' => 'To create a new post in the newsfeed',
-            'controller_action' => 'App\Http\Controllers\NewsfeedController@createNewsfeed'
-        ]);
-        Privilege::create([
-            'name' => 'newsfeed:put',
-            'description' => 'To update a post from the newsfeed',
-            'controller_action' => 'App\Http\Controllers\NewsfeedController@updateNewsfeed',
-        ]);
-        Privilege::create([
-            'name' => 'newsfeed:delete',
-            'description' => 'To delete a post from the newsfeed',
-            'controller_action' => 'App\Http\Controllers\NewsfeedController@deleteNewsfeed',
-        ]);
-        Privilege::create([
-            'name' => 'newsfeed:get',
-            'description' => 'To get a post from the newsfeed',
-            'controller_action' => 'App\Http\Controllers\NewsfeedController@getNewsfeed',
-        ]);
+        $informations = ['newsfeed' => 'NewsfeedController', 'calendar_event' => 'CalendarEventController'];
+        foreach ($informations as $model_table => $controller) {
+            Privilege::create([
+                'name' => $model_table.':post',
+                'description' => 'To create a new post in the '.$model_table,
+                'controller_action' => 'App\\Http\\Controllers\\'.$controller.'@create'
+            ]);
+            Privilege::create([
+                'name' => $model_table.':put',
+                'description' => 'To update a post from the '.$model_table,
+                'controller_action' => 'App\\Http\\Controllers\\'.$controller.'@update',
+            ]);
+            Privilege::create([
+                'name' => $model_table.':delete',
+                'description' => 'To delete a post from the '.$model_table,
+                'controller_action' => 'App\\Http\\Controllers\\'.$controller.'@delete',
+            ]);
+            Privilege::create([
+                'name' => $model_table.':get',
+                'description' => 'To get a post from the '.$model_table,
+                'controller_action' => 'App\\Http\\Controllers\\'.$controller.'@get',
+            ]);
+            Privilege::create([
+                'name' => $model_table.':send_notification',
+                'description' => 'Send '.$model_table.' push notifictions to users mobile app',
+                'controller_action' => 'App\\Http\\Controllers\\'.$controller.'@create'
+            ]);
+        }
+
+
         Privilege::create([
             'name' => 'application:get',
             'description' => 'Get current authenticated application data',
             'controller_action' => 'App\Http\Controllers\ApplicationController@index',
         ]);
-        Privilege::create([
-            'name' => 'newsfeed:send_notification',
-            'description' => 'Send push notifictions to users mobile app',
-            'controller_action' => 'App\Http\Controllers\NewsfeedController@createNewsfeed'
-        ]);
+
     }
 
 }

@@ -30,10 +30,15 @@ $app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers'], funct
 $app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers','middleware'=>['auth_api_key','check_privileges']], function($app)
 {
     // Newsfeed
-    $app->post('newsfeed','NewsfeedController@createNewsfeed');
+    $app->post('newsfeed','NewsfeedController@create');
     $app->get('newsfeed/user/{user_hash_id}','NewsfeedController@getFromUserHashId');    
     $app->get('newsfeed','NewsfeedController@index');
 
+    // Calendar events
+    $app->post('calendar_event','CalendarEventController@create');
+    $app->get('calendar_event/user/{user_hash_id}','CalendarEventController@getFromUserHashId');    
+    $app->get('calendar_event','CalendarEventController@index');
+    
     // Application
     $app->get('application','ApplicationController@index');
     $app->get('application/{id}','ApplicationController@getById');
@@ -57,6 +62,9 @@ $app->group(['prefix' => 'mobile/api/v1','namespace' => '\App\Http\Controllers',
     
     // Newsfeed
     $app->get('newsfeed','NewsfeedController@getFromAuthenticatedUser');
+
+    // Calendar events
+    $app->get('calendar_event','CalendarEventController@getFromAuthenticatedUser');
     
     // Subscriptions
     $app->post('context/subscription','SubscriptionController@subscribeUser');

@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
 class Privilege extends Model
 {
     const NEWSFEED_SEND_NOTIFICATION = 'newsfeed:send_notification';
+    const CALENDAR_EVENT_SEND_NOTIFICATION = 'calendar_event:send_notification';
     
     protected $table = 'privilege';
 
