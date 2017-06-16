@@ -111,8 +111,6 @@ abstract class AbstractInformationController extends Controller
     }
     protected function setFromRequest(AbstractInformation $information, Request $request)
     {
-        //$newsfeed->title = $request->input('title');
-        //$newsfeed->content = $request->input('content');
         $information->application_id = $this->getApplication()->id;
         $information->send_notification = ($request->input('send_notification')?1:0);
         $information->global = ($request->input('global')?1:0);

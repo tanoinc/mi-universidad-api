@@ -34,7 +34,7 @@ abstract class AbstractInformation extends Model
         parent::__construct($attributes);
     }
 
-        public function application()
+    public function application()
     {
         return $this->belongsTo('App\Application');
     }

@@ -43,11 +43,17 @@ $app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers','middle
     $app->get('application','ApplicationController@index');
     $app->get('application/{id}','ApplicationController@getById');
     $app->post('application','ApplicationController@createApplication');
-    $app->put('application/{id}','ApplicationController@updateApplication');
-    $app->delete('application/{id}','ApplicationController@deleteApplication');
+    //$app->put('application/{id}','ApplicationController@updateApplication');
+    //$app->delete('application/{id}','ApplicationController@deleteApplication');
 
     // Application privileges
     $app->get('application/{id}/granted_privileges','ApplicationController@getApplicationGrantedPrivileges');
+    
+    // Content: Generic content CRUD
+    $app->get('content','ContentController@index');
+    $app->post('content/{content_type}','ContentController@create');
+    $app->put('content/{content_id}','ContentController@update');
+    $app->delete('content/{content_id}','ContentController@delete');    
 });
 
 // Mobile app (OAuth2)
