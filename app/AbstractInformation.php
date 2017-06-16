@@ -113,7 +113,8 @@ abstract class AbstractInformation extends Model
             ->whereIn(static::TABLE_NAME.'.application_id', function($query_in) use ($user) {
                 $query_in->select('application_id')
                 ->from('user_application')
-                ->where('user_id', '=', $user->id);
+                ->where('user_id', '=', $user->id)
+                ->whereNotNull('granted_privilege_version');
             })
         ->whereNull(static::TABLE_NAME.'.deleted_at')
         ->union($query);

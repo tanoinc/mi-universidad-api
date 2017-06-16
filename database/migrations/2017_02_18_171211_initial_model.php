@@ -46,11 +46,13 @@ class InitialModel extends Migration
             $table->integer('application_id')->unsigned();
             $table->integer('user_id')->unsigned();
             $table->string('external_id', 100);
-            $table->integer('granted_privilege_version');
+            $table->integer('granted_privilege_version')->nullable();
+            $table->string('subscription_token', 255)->nullable();
             $table->timestamps();
             $table->softDeletes();
             $table->foreign('application_id')->references('id')->on('application');
             $table->foreign('user_id')->references('id')->on('user');
+            $table->index('subscription_token');
         });
         
         Schema::create('context', function (Blueprint $table) {

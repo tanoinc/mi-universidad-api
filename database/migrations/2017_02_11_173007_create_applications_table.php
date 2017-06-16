@@ -21,6 +21,8 @@ class CreateApplicationsTable extends Migration
             $table->string('description', 255);
             $table->string('api_secret', 100);
             $table->integer('privilege_version')->default(1);
+            $table->boolean('auth_required')->default(false);
+            $table->string('auth_callback_url', 255)->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

@@ -23,7 +23,7 @@ class Application extends Model
         'name', 'description',
     ];
     protected $hidden = [
-        'id', 'api_key', 'deleted_at', 'updated_at', 'api_secret', 'pivot'
+        'id', 'api_key', 'deleted_at', 'updated_at', 'api_secret', 'pivot', 'auth_callback_url'
     ];
 
     public function privileges()

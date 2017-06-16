@@ -15,7 +15,7 @@ class Content extends Migration
     {
         Schema::create('content', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('name', 40);
+            $table->string('name', 50);
             $table->string('description', 255); 
             $table->string('icon_name', 50); 
             $table->integer('order')->default(100); 

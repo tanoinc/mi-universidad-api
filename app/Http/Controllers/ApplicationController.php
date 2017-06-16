@@ -11,6 +11,7 @@ namespace App\Http\Controllers;
 use \App\Application;
 use Illuminate\Http\Request;
 use App\User;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Description of ApplicationController
@@ -78,5 +79,33 @@ class ApplicationController extends Controller
         $applications = Application::search($search_value)->paginate(env('ITEMS_PER_PAGE_DEFAULT',20));
 
         return response()->json($applications);
-    }    
+    }
+    public function add(Request $request, $application_name)
+    {
+        $app = Application::findByName($application_name)->firstOrFail();
+        $application_subscription = new \App\UserApplication();
+        $application_subscription->application_id = $app->id;
+        $application_subscription->user_id = Auth::user()->id;
+        if ($app->auth_callback_url != '' and $app->auth_required) {
+            $token = $application_subscription->generateSubscriptionToken();
+            $application_subscription->save();
+            return redirect($app->auth_callback_url.'?id='.Auth::user()->hash_id.'&token='.$token);
+        } else {
+            $application_subscription->grant($app);
+            $application_subscription->save();
+            return response()->json($app);
+        }
+    }
+    
+    public function updateSubscription(Request $request, $id, $token) 
+    {
+        $user = User::findByHashId($id)->firstOrFail();
+        $application_subscription = \App\UserApplication::findForSubscription($this->getApplication(), $user, $token)->firstOrFail();
+        $application_subscription->external_id = $request->input('external_id');
+        $application_subscription->grant($this->getApplication());
+        $application_subscription->save();
+        
+        return response()->json($application_subscription);
+        
+    }
 }

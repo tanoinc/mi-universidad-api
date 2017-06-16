@@ -34,6 +34,18 @@ class ApplicationTableSeeder extends Seeder
         ]);
         $all_privileges = Privilege::all();
         $app->privileges()->attach($all_privileges);
+        
+        $app = Application::create([
+            'name' => "auth-test-app",
+            'description' => "Auth mobile app",
+            'api_key' => sha1(random_bytes(8).microtime()),
+            'api_secret' => sha1(random_bytes(8).microtime()),
+            'privilege_version' => 1,
+            'auth_required' => true,
+            'auth_callback_url' => 'http://2770281b.ngrok.io/mi_universidad_conectar',
+        ]);
+        $all_privileges = Privilege::all();
+        $app->privileges()->attach($all_privileges);
     }
 
 }

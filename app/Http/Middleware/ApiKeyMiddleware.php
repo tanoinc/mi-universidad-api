@@ -85,6 +85,7 @@ class ApiKeyMiddleware
     {
         $hash = hash_hmac($this->getHmacHashFunction(), $this->getHmacContent($request), $this->getApplication()->api_secret);
         Log::debug(sprintf('Signature: Expected [%s], Received [%s]', $hash, $this->auth_signature));
+        //Log::debug(sprintf('data: %s', $this->getHmacContent($request)));
 
         return ($hash == $this->auth_signature);
     }

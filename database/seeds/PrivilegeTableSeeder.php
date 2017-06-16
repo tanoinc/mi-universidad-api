@@ -25,26 +25,26 @@ class PrivilegeTableSeeder extends Seeder
      */
     public function run()
     {
-        $informations = ['newsfeed' => 'NewsfeedController', 'calendar_event' => 'CalendarEventController'];
+        $informations = ['newsfeed' => 'NewsfeedController', 'calendar_event' => 'CalendarEventController', 'content' => 'ContentController'];
         foreach ($informations as $model_table => $controller) {
             Privilege::create([
                 'name' => $model_table.':post',
-                'description' => 'To create a new post in the '.$model_table,
+                'description' => 'To create a new item in the '.$model_table,
                 'controller_action' => 'App\\Http\\Controllers\\'.$controller.'@create'
             ]);
             Privilege::create([
                 'name' => $model_table.':put',
-                'description' => 'To update a post from the '.$model_table,
+                'description' => 'To update an item from the '.$model_table,
                 'controller_action' => 'App\\Http\\Controllers\\'.$controller.'@update',
             ]);
             Privilege::create([
                 'name' => $model_table.':delete',
-                'description' => 'To delete a post from the '.$model_table,
+                'description' => 'To delete an item from the '.$model_table,
                 'controller_action' => 'App\\Http\\Controllers\\'.$controller.'@delete',
             ]);
             Privilege::create([
                 'name' => $model_table.':get',
-                'description' => 'To get a post from the '.$model_table,
+                'description' => 'To get an item from the '.$model_table,
                 'controller_action' => 'App\\Http\\Controllers\\'.$controller.'@get',
             ]);
             Privilege::create([
@@ -54,13 +54,21 @@ class PrivilegeTableSeeder extends Seeder
             ]);
         }
 
-
         Privilege::create([
             'name' => 'application:get',
             'description' => 'Get current authenticated application data',
             'controller_action' => 'App\Http\Controllers\ApplicationController@index',
         ]);
-
+        Privilege::create([
+            'name' => 'content:list',
+            'description' => 'Get the content list from the authenticated app',
+            'controller_action' => 'App\Http\Controllers\ContentController@index',
+        ]);
+        Privilege::create([
+            'name' => 'application:subscribe',
+            'description' => 'Subscribe application to users',
+            'controller_action' => 'App\Http\Controllers\ApplicationController@updateSubscription',
+        ]);        
     }
 
 }

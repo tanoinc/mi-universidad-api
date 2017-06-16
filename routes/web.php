@@ -43,6 +43,7 @@ $app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers','middle
     $app->get('application','ApplicationController@index');
     $app->get('application/{id}','ApplicationController@getById');
     $app->post('application','ApplicationController@createApplication');
+    $app->put('application/subscription/{id}/{token}','ApplicationController@updateSubscription');
     //$app->put('application/{id}','ApplicationController@updateApplication');
     //$app->delete('application/{id}','ApplicationController@deleteApplication');
 
@@ -52,8 +53,8 @@ $app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers','middle
     // Content: Generic content CRUD
     $app->get('content','ContentController@index');
     $app->post('content/{content_type}','ContentController@create');
-    $app->put('content/{content_id}','ContentController@update');
-    $app->delete('content/{content_id}','ContentController@delete');    
+    $app->put('content/{id}','ContentController@update');
+    $app->delete('content/{id}','ContentController@delete');    
 });
 
 // Mobile app (OAuth2)
@@ -62,6 +63,7 @@ $app->group(['prefix' => 'mobile/api/v1','namespace' => '\App\Http\Controllers',
     // Applications
     $app->get('application','ApplicationController@getFromAuthenticatedUser');
     $app->get('application/available','ApplicationController@getAvailable');
+    $app->post('application/subscription/{application_name}', 'ApplicationController@add');
 
     // Notifications
     $app->get('notification','NotificationController@getFromAuthenticatedUser');

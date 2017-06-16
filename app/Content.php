@@ -20,7 +20,7 @@ class Content extends Model
         'order',
     ];
     protected $hidden = [
-        'id', 'deleted_at', 'updated_at', 'application_id', 'contained_id'
+        'deleted_at', 'updated_at', 'application_id', 'contained_id'
     ];
 
     public function application()
