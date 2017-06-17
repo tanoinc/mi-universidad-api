@@ -110,13 +110,26 @@ class ContentController extends Controller
 
     public function update(Request $request, $id)
     {
+        $this->validate($request, $this->getUpdateConstraints());        
         $content = Content::findOrFail($id);
-        $this->validate($request, $this->getUpdateConstraints());
         if ($content->application_id != $this->getApplication()->id) {
             throw new ForbiddenAccessException();
         }
 
         return response()->json( $this->saveFromRequest($content, $request) );
     }
-
+    
+    protected function getFromUser(\App\User $user)
+    {
+        $contents = Application::fromUserWithContents($user)->get();
+        
+        return response()->json($contents);
+    }
+    
+    public function getFromApplication(Request $request, $applciation_name)
+    {
+        $contents = Application::with('contents.contained')->findByName($applciation_name)->get();
+        
+        return response()->json($contents);
+    }
 }

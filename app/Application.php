@@ -41,6 +41,11 @@ class Application extends Model
         return $this->belongsToMany('App\User', 'user_application');
     }
     
+    public function subscribed_users()
+    {
+        return User::addApplicationSubscriptionCondition($this->users());
+    }
+    
     public function granted_action($controller_action_name)
     {
         return $this->granted_privileges()->where('privilege.controller_action', '=', $controller_action_name);
@@ -71,6 +76,11 @@ class Application extends Model
         return $this->hasMany('App\Context');
     }
 
+    public function contents()
+    {
+        return $this->hasMany('App\Content');
+    }    
+    
     public function global_newsfeeds($union = null)
     {
         $q = $this->newsfeeds()->where('global', true)->orderBy('created_at', 'desc');
@@ -95,4 +105,15 @@ class Application extends Model
         return $query->where('name', 'LIKE', "%$value%");
     }
 
+    public function scopeFromUserWithContents($query, User $user)
+    {
+        
+        return 
+            $query->with(['contents' => function ($query2) {
+                $query2->orderBy('order');
+            }, 'contents.contained'])->whereHas('subscribed_users', function ($query2) use ($user) {
+                $query2->where('user_id', $user->id);
+            });
+    }    
+    
 }

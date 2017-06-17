@@ -34,6 +34,16 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     {
         return $this->belongsToMany('App\Application', 'user_application');
     }
+    
+    public function subscribed_applications()
+    {
+        return static::addApplicationSubscriptionCondition($this->applications());
+    }
+    
+    public static function addApplicationSubscriptionCondition($query) 
+    {
+        return $query->whereNotNull('granted_privilege_version');
+    }
 
     public function newsfeeds()
     {

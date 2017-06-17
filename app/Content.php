@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Content extends Model
 {
-   
+
     protected $table = 'content';
     protected $fillable = [
         'name',
@@ -27,14 +27,22 @@ class Content extends Model
     {
         return $this->belongsTo('App\Application', 'application_id');
     }
-    
+
     public function contained()
     {
         return $this->morphTo();
     }
-    
+
     public function scopeFromApplication($query, Application $app)
     {
         return $query->where('application_id', $app->id);
+    }
+
+    public function scopeFromUser($query, User $user)
+    {
+        return $query->with(['application','contained'])
+            ->whereIn('application_id', 
+                $user->subscribed_applications()->get()->map(function ($a) { return $a->id; }
+            ));
     }
 }

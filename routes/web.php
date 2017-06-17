@@ -64,6 +64,8 @@ $app->group(['prefix' => 'mobile/api/v1','namespace' => '\App\Http\Controllers',
     $app->get('application','ApplicationController@getFromAuthenticatedUser');
     $app->get('application/available','ApplicationController@getAvailable');
     $app->post('application/subscription/{application_name}', 'ApplicationController@add');
+    $app->get('application/content','ContentController@getFromAuthenticatedUser');
+    $app->get('application/content/{application_name}','ContentController@getFromApplication');
 
     // Notifications
     $app->get('notification','NotificationController@getFromAuthenticatedUser');
@@ -87,4 +89,7 @@ $app->group(['prefix' => 'mobile/api/v1','namespace' => '\App\Http\Controllers',
     $app->get('user','UserController@getFromAuthenticatedUser');
     $app->post('user/push_token','UserController@registerPushToken');
     $app->delete('user/push_token/{type}/{token}','UserController@unregisterPushToken');
+    
+    // Contents
+    $app->get('content','ContentController@getFromAuthenticatedUser');
 });
