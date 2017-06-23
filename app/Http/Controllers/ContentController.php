@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use App\Content;
 use App\Exceptions\ForbiddenAccessException;
 use App\ContentGoogleMap;
+use Illuminate\Support\Facades\Auth;
 /**
  * Description of ApplicationController
  *
@@ -126,10 +127,27 @@ class ContentController extends Controller
         return response()->json($contents);
     }
     
-    public function getFromApplication(Request $request, $applciation_name)
+    public function getFromApplication(Request $request, $application_name)
     {
-        $contents = Application::with('contents.contained')->findByName($applciation_name)->get();
+        $contents = Application::with('contents.contained')->findByName($application_name)->get();
         
         return response()->json($contents);
+    }
+    
+    public function getFromUrl(Request $request, $content_id)
+    {
+        $content = Content::with(['contained','application'])->find($content_id)->firstOrFail();
+        $http = new \App\Library\Http($content->contained->url);
+        $response = null;
+        if ($content->contained->send_user_info) {
+            $user_application = \App\UserApplication::findByApplicationIdAndUserId($content->application_id, Auth::user()->id)->firstOrFail();
+            $data = $request->all();
+            $data['external_id'] = $user_application->external_id;            
+            $response = $http->post($data);
+        } else {
+            $response = json_decode($http->get());
+        }
+
+        return response()->json( $response );
     }
 }

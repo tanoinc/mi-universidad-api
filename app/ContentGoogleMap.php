@@ -21,11 +21,18 @@ class ContentGoogleMap extends Model
         'send_user_info',
     ];
     protected $hidden = [
-        'id', 'created_at', 'updated_at'
+        'id', 'created_at', 'updated_at','url'
     ];
-    
+    protected $appends = ['data_url'];
     public function contents()
     {
         return $this->morphMany('App\Content', 'contained');
-    }    
+    }
+    
+    public function getDataUrlAttribute() {
+        if ($this->send_user_info) {
+            return null;
+        }
+        return $this->url;
+    }
 }

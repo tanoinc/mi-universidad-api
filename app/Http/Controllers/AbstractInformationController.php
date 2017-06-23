@@ -35,11 +35,16 @@ abstract class AbstractInformationController extends Controller
 
         return response()->json($information);
     }
+    
+    protected function getQueryFromUser(User $user) 
+    {
+        $model_class = $this->getModelClass();
+        return $model_class::fromUser($user);
+    }
 
     protected function getFromUser(User $user, $order_by = 'created_at', $order = 'desc')
     {
-        $model_class = $this->getModelClass();
-        $information = $model_class::fromUser($user)->orderBy($order_by,$order)->simplePaginate(env('ITEMS_PER_PAGE_DEFAULT',20));
+        $information = $this->getQueryFromUser($user)->orderBy($order_by,$order)->simplePaginate(env('ITEMS_PER_PAGE_DEFAULT',20));
 
         return response()->json($information);
     }

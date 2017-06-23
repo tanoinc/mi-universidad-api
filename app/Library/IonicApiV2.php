@@ -15,20 +15,19 @@ use GuzzleHttp\Client;
  *
  * @author lucianoc
  */
-class IonicApiV2
+class IonicApiV2 extends Http
 {
 
     const RECIPIENT_ALL = "RECIPIENT_ALL";
 
     private $ionic_push_profile;
     private $ionic_token;
-    private $http_client;
 
     public function __construct($ionic_endpoint_url, $ionic_push_profile, $ionic_token)
     {
+        parent::__construct($ionic_endpoint_url);
         $this->ionic_push_profile = $ionic_push_profile;
         $this->ionic_token = $ionic_token;
-        $this->http_client = new Client([ 'base_uri' => $ionic_endpoint_url]);
     }
 
     protected function getHeaders()
@@ -43,12 +42,18 @@ class IonicApiV2
         $tokens = [];
         foreach ($users as $user) {
             foreach ($user->pushTokens()->get() as $token) {
-                if ($token->token != '')
+                if ($token->token != '') {
                     $tokens[] = $token->token;
+                }
             }
         }
 
         return $tokens;
+    }
+    
+    protected static function encode($data)
+    {
+        return json_encode($data);
     }
     
     public function sendPushNotification($recipients, $title, $message, $payload = null)
@@ -74,22 +79,12 @@ class IonicApiV2
         {
             return 'push-notifications-disabled';
         }
-        $res = $this->http_client->request('POST', 'push/notifications', ['headers' => $this->getHeaders(), 'body' => json_encode($body)]);
         
-        $notification = static::decodeBody( $res->getHeaderLine('Content-Type'), $res->getBody() );
+        $notification = $this->post($body, 'push/notifications');
+
         if ($notification->meta->status >= 200 and $notification->meta->status <= 299) {
             return $notification->data->uuid;
         }
         throw new \App\Exceptions\PushNotificationException();
     }
-    
-    protected static function decodeBody($content_type, $body) 
-    {
-        if ($content_type == 'application/json; charset=utf-8') {
-            return json_decode($body);
-        } else {
-            throw new \App\Exceptions\ContentTypeDecodingException();
-        }
-    }
-
 }

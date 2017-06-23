@@ -42,6 +42,23 @@ class UserApplication extends Model
         return $query;
     }
     
+    public function scopeFindByApplicationAndUser($query, Application $application, User $user) 
+    {
+        return $this->scopeFindByApplicationIdAndUserId($query, $application->id, $user->id);
+    }
+
+    public function scopeFindByApplicationIdAndUserId($query, $application_id, $user_id)
+    {
+        User::addApplicationSubscriptionCondition($query)->where('application_id', '=', $application_id);
+        if (is_array($user_id)) {
+            $query->whereIn('user_id', $user_id);
+        } else {
+            $query->where('user_id', '=', $user_id);
+        }
+        
+        return $query;
+    }
+    
     public function scopeFindForSubscription($query, \App\Application $application, \App\User $user, $token) {
         $query->where('application_id', '=', $application->id)
                 ->whereNull('granted_privilege_version')

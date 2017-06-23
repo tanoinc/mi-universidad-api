@@ -12,7 +12,7 @@
 */
 
 $app->get('/', function () use ($app) {
-    return "Hola!";
+    return sprintf("Hola %s!", env('MOBILE_APP_NAME'));
 });
 
 // Public
@@ -75,6 +75,8 @@ $app->group(['prefix' => 'mobile/api/v1','namespace' => '\App\Http\Controllers',
 
     // Calendar events
     $app->get('calendar_event','CalendarEventController@getFromAuthenticatedUser');
+    $app->get('calendar_event/past','CalendarEventController@getPast');
+    $app->get('calendar_event/future','CalendarEventController@getFuture');
     
     // Subscriptions
     $app->post('context/subscription','SubscriptionController@subscribeUser');
@@ -92,4 +94,6 @@ $app->group(['prefix' => 'mobile/api/v1','namespace' => '\App\Http\Controllers',
     
     // Contents
     $app->get('content','ContentController@getFromAuthenticatedUser');
+    $app->get('content/data_url/{content_id}','ContentController@getFromUrl');
+    $app->post('content/data_url/{content_id}','ContentController@getFromUrl');
 });
