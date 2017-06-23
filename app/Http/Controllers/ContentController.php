@@ -25,13 +25,13 @@ class ContentController extends Controller
     protected static $content_types = [
         'google_map' => ContentGoogleMap::class,
     ];
-    
+
     protected static function contentTypeParse($content_type)
     {
         if (!isset(static::$content_types[$content_type])) {
             throw new \App\Exceptions\CustomValidationException('Content type unknown.');
         }
-        
+
         return static::$content_types[$content_type];
     }
 
@@ -48,7 +48,7 @@ class ContentController extends Controller
             'url' => 'url',
         ];
     }
-    
+
     protected function getUpdateConstraints()
     {
         return [
@@ -62,20 +62,20 @@ class ContentController extends Controller
             'url' => 'url',
         ];
     }
-    
+
     public function index(Request $request)
     {
         $contents = Content::fromApplication($this->getApplication())->with(['contained'])->orderBy('order','asc')->get();
-        
+
         return response()->json($contents);
     }
-    
-    protected function saveFromRequest($content, Request $request, $content_type = null) 
+
+    protected function saveFromRequest($content, Request $request, $content_type = null)
     {
         $content->fill($request->all());
         $content->application_id = $this->getApplication()->id;
         $content->save();
-        
+
         if ($content_type) {
             $content_type_class = static::contentTypeParse($content_type);
             $content_type_object = new $content_type_class;
@@ -87,14 +87,14 @@ class ContentController extends Controller
         $content_type_object->cache = ($request->input('cache') == true or $request->input('cache') == 'true' or $request->input('cache') == 1);
         $content_type_object->save();
         $content_type_object->contents()->saveMany([$content]);
-        
+
         return $content;
     }
 
     public function create(Request $request, $content_type)
     {
         $this->validate($request, $this->getCreationConstraints());
-        
+
         return response()->json($this->saveFromRequest( new Content(), $request, $content_type));
     }
 
@@ -111,7 +111,7 @@ class ContentController extends Controller
 
     public function update(Request $request, $id)
     {
-        $this->validate($request, $this->getUpdateConstraints());        
+        $this->validate($request, $this->getUpdateConstraints());
         $content = Content::findOrFail($id);
         if ($content->application_id != $this->getApplication()->id) {
             throw new ForbiddenAccessException();
@@ -119,31 +119,31 @@ class ContentController extends Controller
 
         return response()->json( $this->saveFromRequest($content, $request) );
     }
-    
+
     protected function getFromUser(\App\User $user)
     {
         $contents = Application::fromUserWithContents($user)->get();
-        
+
         return response()->json($contents);
     }
-    
+
     public function getFromApplication(Request $request, $application_name)
     {
         $contents = Application::with('contents.contained')->findByName($application_name)->get();
-        
+
         return response()->json($contents);
     }
-    
+
     public function getFromUrl(Request $request, $content_id)
     {
-        $content = Content::with(['contained','application'])->find($content_id)->firstOrFail();
+        $content = Content::with(['contained','application'])->findOrFail($content_id);
         $http = new \App\Library\Http($content->contained->url);
         $response = null;
         if ($content->contained->send_user_info) {
             $user_application = \App\UserApplication::findByApplicationIdAndUserId($content->application_id, Auth::user()->id)->firstOrFail();
             $data = $request->all();
-            $data['external_id'] = $user_application->external_id;            
-            $response = $http->post($data);
+            $data['external_id'] = $user_application->external_id;
+            $response = json_decode( $http->post($data) );
         } else {
             $response = json_decode($http->get());
         }

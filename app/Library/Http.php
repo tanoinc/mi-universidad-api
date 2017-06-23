@@ -24,18 +24,21 @@ class Http
     
     protected function getHeaders()
     {
-        return [];
+        return [
+            'Content-Type' => 'application/x-www-form-urlencoded'
+        ];
     }
     
-    protected static function encode($data) 
+    protected function encode($data) 
     {
         $headers = $this->getHeaders();
         if (isset($headers['Content-Type'])) {
             if ($headers['Content-Type'] == 'application/json') {
-                
                 return json_encode($data);
+            } elseif ($headers['Content-Type'] == 'application/x-www-form-urlencoded') {
+                return http_build_query($data);
             }
-            throw new \App\Exceptions\CustomValidationException();
+            throw new \App\Exceptions\ContentTypeDecodingException();
         }
         
         return http_build_query($data);
@@ -55,7 +58,7 @@ class Http
         $content = array();
         $content['headers'] = $this->getHeaders();
         if ($method != 'GET') {
-            $content['body'] = static::encode($data);
+            $content['body'] = $this->encode($data);
         }
         try {
             $res = $this->http_client->request($method, $url, $content);

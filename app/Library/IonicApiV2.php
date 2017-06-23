@@ -51,7 +51,7 @@ class IonicApiV2 extends Http
         return $tokens;
     }
     
-    protected static function encode($data)
+    protected function encode($data)
     {
         return json_encode($data);
     }
