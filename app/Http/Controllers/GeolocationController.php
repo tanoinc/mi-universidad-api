@@ -20,7 +20,7 @@ use Illuminate\Http\Request;
 class GeolocationController extends Controller
 {
 
-    public function getFromUserHashId($user_hash_id)
+    public function getFromUserHashId(\Illuminate\Http\Request $request, $user_hash_id)
     {
         $user = User::findByHashId($user_hash_id)->firstOrFail();
         $application = $user->subscribed_applications()->where('application_id', $this->getApplication()->id)->firstOrFail();
