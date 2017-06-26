@@ -60,6 +60,11 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         return $this->hasMany('App\UserPushToken');
     }
 
+    public function geolocations()
+    {
+        return $this->hasMany('App\UserPushToken');
+    }
+    
     public function scopeFindByHashId($query, $hash_id)
     {
         return $query->where('hash_id', '=', $hash_id);

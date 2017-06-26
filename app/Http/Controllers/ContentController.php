@@ -142,6 +142,7 @@ class ContentController extends Controller
         if ($content->contained->send_user_info) {
             $user_application = \App\UserApplication::findByApplicationIdAndUserId($content->application_id, Auth::user()->id)->firstOrFail();
             $data = $request->all();
+            $this->saveGeolocation($data);
             $data['external_id'] = $user_application->external_id;
             $response = json_decode( $http->post($data) );
         } else {
@@ -150,4 +151,16 @@ class ContentController extends Controller
 
         return response()->json( $response );
     }
+
+    public function saveGeolocation($data)
+    {
+        $user_id = Auth::user()->id;
+        $geolocation = \App\Geolocation::firstOrNew(['user_id' => $user_id]);
+        $geolocation->fill($data);
+        $geolocation->user_id = $user_id;
+        $geolocation->save();
+        
+        return $geolocation;
+    }
+
 }

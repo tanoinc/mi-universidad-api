@@ -55,6 +55,9 @@ $app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers','middle
     $app->post('content/{content_type}','ContentController@create');
     $app->put('content/{id}','ContentController@update');
     $app->delete('content/{id}','ContentController@delete');    
+    
+    //Geolocation
+    $app->get('geolocation/user/{user_hash_id}','GeolocationController@getFromUserHashId');    
 });
 
 // Mobile app (OAuth2)
