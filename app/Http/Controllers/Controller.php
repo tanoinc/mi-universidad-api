@@ -8,6 +8,7 @@ use App\User;
 use Illuminate\Support\Facades\Auth;
 use App\Exceptions\CustomValidationException;
 use Illuminate\Validation\ValidationException;
+use App\UserApplication;
 
 class Controller extends BaseController
 {
@@ -65,5 +66,14 @@ class Controller extends BaseController
         }
         return $search_value; 
     }
-
+    
+    protected function getUsersFromRequest(Request $request, $with = [])
+    {
+        $app_id = $this->getApplication()->id;
+        if ($request->input('users')) {
+            
+            return UserApplication::with($with)->findByApplicationAndExternalId( $app_id, $request->input('users') )->get();
+        }
+        return new \Illuminate\Support\Collection([]);
+    }
 }

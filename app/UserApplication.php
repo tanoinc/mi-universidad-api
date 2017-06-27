@@ -32,7 +32,7 @@ class UserApplication extends Model
     
     public function scopeFindByApplicationAndExternalId($query, $application_id, $external_id)
     {
-        $query->where('application_id', '=', $application_id)->whereNotNull('granted_privilege_version');
+        User::addApplicationSubscriptionCondition($query->where('application_id', '=', $application_id));
         if (is_array($external_id)) {
             $query->whereIn('external_id', $external_id);
         } else {

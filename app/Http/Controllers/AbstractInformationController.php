@@ -138,13 +138,4 @@ abstract class AbstractInformationController extends Controller
         return $context;
     }
 
-    protected function getUsersFromRequest(Request $request)
-    {
-        $app_id = $this->getApplication()->id;
-        if ($request->input('users')) {
-            
-            return UserApplication::findByApplicationAndExternalId( $app_id, $request->input('users') )->get();
-        }
-        return new \Illuminate\Support\Collection([]);
-    }
 }

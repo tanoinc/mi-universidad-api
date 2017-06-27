@@ -12,6 +12,7 @@ use App\CalendarEvent;
 use Illuminate\Support\Facades\Auth;
 use App\User;
 use Illuminate\Http\Request;
+use App\UserApplication;
 /**
  * The Geolocation controller class
  *
@@ -20,17 +21,21 @@ use Illuminate\Http\Request;
 class GeolocationController extends Controller
 {
 
-    public function getFromUserHashId(\Illuminate\Http\Request $request, $user_hash_id)
+    public function getFromUserHashId(Request $request, $user_external_id)
     {
-        $user = User::findByHashId($user_hash_id)->firstOrFail();
-        $application = $user->subscribed_applications()->where('application_id', $this->getApplication()->id)->firstOrFail();
+        $user_application = UserApplication::with('user')->findByApplicationAndExternalId( $this->getApplication()->id, $user_external_id )->firstOrFail();
         
-        return response()->json($user->geolocations()->first());
+        return response()->json($user_application->user()->first()->geolocations()->firstOrFail());
     }
     
     public function getFromUsers(Request $request)
     {
+        $users = $this->getUsersFromRequest($request, ['user']);
+        $locations = $users->mapWithKeys(function ($user, $key) {
+            return [$user->external_id => $user->user()->first()->geolocations()->first()];
+        });
         
+        return response()->json($locations);
     }
-
+    
 }
