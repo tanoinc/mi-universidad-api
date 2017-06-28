@@ -142,7 +142,11 @@ class ContentController extends Controller
         if ($content->contained->send_user_info) {
             $user_application = \App\UserApplication::findByApplicationIdAndUserId($content->application_id, Auth::user()->id)->firstOrFail();
             $data = $request->all();
-            $this->saveGeolocation($data);
+            \Illuminate\Support\Facades\Log::debug(sprintf('Content data received: [%s]', str_replace("\n",'', file_get_contents("php://input")) ));
+            if (!empty($data))
+            {
+                $this->saveGeolocation($data);
+            }
             $data['external_id'] = $user_application->external_id;
             $response = json_decode( $http->post($data) );
         } else {
@@ -154,12 +158,15 @@ class ContentController extends Controller
 
     public function saveGeolocation($data)
     {
-        $user_id = Auth::user()->id;
-        $geolocation = \App\Geolocation::firstOrNew(['user_id' => $user_id]);
-        $geolocation->fill($data);
-        $geolocation->user_id = $user_id;
-        $geolocation->save();
-        
+        $geolocation = null;
+        if (isset($data['coords']) and isset($data['coords']['latitude']) and isset($data['coords']['longitude']))
+        {
+            $user_id = Auth::user()->id;
+            $geolocation = \App\Geolocation::firstOrNew(['user_id' => $user_id]);
+            $geolocation->fill($data['coords']);
+            $geolocation->user_id = $user_id;
+            $geolocation->save();
+        }
         return $geolocation;
     }
 
