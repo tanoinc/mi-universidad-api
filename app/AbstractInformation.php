@@ -93,7 +93,7 @@ abstract class AbstractInformation extends Model
         return $this->users_notification;
     }
     
-    public static function fromUser($user)
+    protected static function queryFromUser($user)
     {
         $query = DB::table(static::TABLE_NAME)
             ->select(static::TABLE_NAME.'.*','application.description AS application_description', 'context.name as context_name','context.description as context_description')
@@ -105,6 +105,12 @@ abstract class AbstractInformation extends Model
                     ->where('user_id', '=', $user->id);
         })
         ->whereNull(static::TABLE_NAME.'.deleted_at');
+        
+        return $query;
+    }
+
+    protected static function queryFromApplication($user)
+    {
         $query2 = DB::table(static::TABLE_NAME)
             ->select(static::TABLE_NAME.'.*','application.description AS application_description', 'context.name as context_name','context.description as context_description')
             ->where('global', '=', true)
@@ -116,8 +122,13 @@ abstract class AbstractInformation extends Model
                 ->where('user_id', '=', $user->id)
                 ->whereNotNull('granted_privilege_version');
             })
-        ->whereNull(static::TABLE_NAME.'.deleted_at')
-        ->union($query);
+        ->whereNull(static::TABLE_NAME.'.deleted_at');
+            
+        return $query2;
+    }
+
+    protected static function queryFromContext($user)
+    {
         $query3 = DB::table(static::TABLE_NAME)
             ->select(static::TABLE_NAME.'.*','application.description AS application_description', 'context.name as context_name','context.description as context_description')
             ->leftJoin('application', static::TABLE_NAME.'.application_id', '=', 'application.id')
@@ -128,6 +139,15 @@ abstract class AbstractInformation extends Model
                 ->where('user_id', '=', $user->id);
         })
         ->whereNull(static::TABLE_NAME.'.deleted_at');
+            
+        return $query3;
+    }
+    
+    public static function fromUser($user)
+    {
+        $query = static::queryFromUser($user);
+        $query2 = static::queryFromApplication($user)->union($query);
+        $query3 = static::queryFromContext($user);
         $query2->union($query3);
 
         return $query2;

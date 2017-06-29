@@ -81,6 +81,7 @@ $app->group(['prefix' => 'mobile/api/v1','namespace' => '\App\Http\Controllers',
     $app->get('calendar_event','CalendarEventController@getFromAuthenticatedUser');
     $app->get('calendar_event/past','CalendarEventController@getPast');
     $app->get('calendar_event/future','CalendarEventController@getFuture');
+    $app->get('calendar_event/between_dates/{start_date}/{end_date}','CalendarEventController@getBetweenDates');
     
     // Subscriptions
     $app->post('context/subscription','SubscriptionController@subscribeUser');

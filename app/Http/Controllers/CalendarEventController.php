@@ -60,5 +60,13 @@ class CalendarEventController extends AbstractInformationController
 
         return response()->json($information);
     }
+    
+    public function getBetweenDates(\Illuminate\Http\Request $request, $start_date, $end_date)
+    {
+        $information = CalendarEvent::fromUserBetweenDates(Auth::user(), new \DateTime($start_date), new \DateTime($end_date) )
+            ->simplePaginate(env('ITEMS_PER_PAGE_CALENDAR', 100));
+
+        return response()->json( $information );
+    }
 
 }
