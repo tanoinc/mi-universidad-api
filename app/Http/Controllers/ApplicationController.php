@@ -80,16 +80,17 @@ class ApplicationController extends Controller
 
         return response()->json($applications);
     }
-    public function add(Request $request, $application_name)
+    public function add(Request $request)
     {
-        $app = Application::findByName($application_name)->firstOrFail();
-        $application_subscription = new \App\UserApplication();
+        $app = Application::findByName($request->input('application_name'))->firstOrFail();
+        //$application_subscription = new \App\UserApplication();
+        $application_subscription = \App\UserApplication::firstOrNew(['application_id'=>$app->id, 'user_id'=>Auth::user()->id]);
         $application_subscription->application_id = $app->id;
         $application_subscription->user_id = Auth::user()->id;
         if ($app->auth_callback_url != '' and $app->auth_required) {
             $token = $application_subscription->generateSubscriptionToken();
             $application_subscription->save();
-            return redirect($app->auth_callback_url.'?id='.Auth::user()->hash_id.'&token='.$token);
+            return response()->json(['url_redirect'=>$app->auth_callback_url.'?id='.Auth::user()->hash_id.'&token='.$token]);
         } else {
             $application_subscription->grant($app);
             $application_subscription->save();
