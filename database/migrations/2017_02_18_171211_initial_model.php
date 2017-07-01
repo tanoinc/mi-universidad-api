@@ -45,7 +45,7 @@ class InitialModel extends Migration
             $table->increments('id');
             $table->integer('application_id')->unsigned();
             $table->integer('user_id')->unsigned();
-            $table->string('external_id', 100);
+            $table->string('external_id', 100)->nullable();
             $table->integer('granted_privilege_version')->nullable();
             $table->string('subscription_token', 255)->nullable();
             $table->timestamps();

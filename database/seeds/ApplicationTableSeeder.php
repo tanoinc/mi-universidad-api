@@ -42,7 +42,7 @@ class ApplicationTableSeeder extends Seeder
             'api_secret' => sha1(random_bytes(8).microtime()),
             'privilege_version' => 1,
             'auth_required' => true,
-            'auth_callback_url' => 'http://2770281b.ngrok.io/mi_universidad_conectar',
+            'auth_callback_url' => 'http://localhost:8803/mi_universidad_conectar',
         ]);
         $all_privileges = Privilege::all();
         $app->privileges()->attach($all_privileges);

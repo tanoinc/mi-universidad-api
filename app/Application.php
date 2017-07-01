@@ -105,6 +105,16 @@ class Application extends Model
         return $query->where('name', 'LIKE', "%$value%");
     }
 
+    public function scopeNotSubscribedBy($query, User $user)
+    {
+        return $query->whereNotIn('id', function ($query_in) use ($user) {
+            $query_in->select('application_id')
+            ->from('user_application')
+            ->where('user_id', '=', $user->id);
+            User::addApplicationSubscriptionCondition($query_in);     
+        });
+    }
+    
     public function scopeFromUserWithContents($query, User $user)
     {
         

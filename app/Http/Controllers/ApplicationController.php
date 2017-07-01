@@ -68,7 +68,8 @@ class ApplicationController extends Controller
 
     protected function getFromUser(User $user)
     {
-        $applications = $user->applications()->simplePaginate(env('ITEMS_PER_PAGE_DEFAULT',20));
+        $search_value = $this->getSearchValue();
+        $applications = $user->subscribed_applications()->search($search_value)->simplePaginate(env('ITEMS_PER_PAGE_DEFAULT',20));
 
         return response()->json($applications);
     }
@@ -76,7 +77,8 @@ class ApplicationController extends Controller
     public function getAvailable(Request $request)
     {
         $search_value = $this->getSearchValue();
-        $applications = Application::search($search_value)->paginate(env('ITEMS_PER_PAGE_DEFAULT',20));
+        $applications = Application::search($search_value)->notSubscribedBy(Auth::user())
+                ->paginate(env('ITEMS_PER_PAGE_DEFAULT',20));
 
         return response()->json($applications);
     }
