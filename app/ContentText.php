@@ -9,15 +9,16 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @author tanoinc
  */
-class ContentGoogleMap extends AbstractContent
+class ContentText extends AbstractContent
 {
    
-    protected $table = 'content_google_map';
+    protected $table = 'content_text';
     protected $fillable = [
-        'description',
+        'text',
         'url',
         'cache',
         'cache_expiration',
         'send_user_info',
     ];
+
 }

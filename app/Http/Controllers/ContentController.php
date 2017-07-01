@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use App\Content;
 use App\Exceptions\ForbiddenAccessException;
 use App\ContentGoogleMap;
+use App\ContentText;
 use Illuminate\Support\Facades\Auth;
 /**
  * Description of ApplicationController
@@ -24,8 +25,9 @@ class ContentController extends Controller
 
     protected static $content_types = [
         'google_map' => ContentGoogleMap::class,
+        'text' => ContentText::class,
     ];
-
+    
     protected static function contentTypeParse($content_type)
     {
         if (!isset(static::$content_types[$content_type])) {
@@ -35,34 +37,6 @@ class ContentController extends Controller
         return static::$content_types[$content_type];
     }
 
-    protected function getCreationConstraints()
-    {
-        return [
-            'name' => 'required|max:40',
-            'description' => 'max:255',
-            'icon_name' => 'max:50',
-            'order' => 'integer',
-            'cache_expiration' => 'date',
-            'cache' => 'boolean',
-            'send_user_info' => 'boolean',
-            'url' => 'url',
-        ];
-    }
-
-    protected function getUpdateConstraints()
-    {
-        return [
-            'name' => 'max:40',
-            'description' => 'max:255',
-            'icon_name' => 'max:50',
-            'order' => 'integer',
-            'cache_expiration' => 'date',
-            'cache' => 'boolean',
-            'send_user_info' => 'boolean',
-            'url' => 'url',
-        ];
-    }
-
     public function index(Request $request)
     {
         $contents = Content::fromApplication($this->getApplication())->with(['contained'])->orderBy('order','asc')->get();
@@ -70,14 +44,12 @@ class ContentController extends Controller
         return response()->json($contents);
     }
 
-    protected function saveFromRequest($content, Request $request, $content_type = null)
+    protected function saveFromRequest($content, Request $request, $content_type_class = null)
     {
         $content->fill($request->all());
         $content->application_id = $this->getApplication()->id;
-        $content->save();
 
-        if ($content_type) {
-            $content_type_class = static::contentTypeParse($content_type);
+        if ($content_type_class) {
             $content_type_object = new $content_type_class;
         } else {
             $content_type_object = $content->contained()->first();
@@ -87,15 +59,17 @@ class ContentController extends Controller
         $content_type_object->cache = ($request->input('cache') == true or $request->input('cache') == 'true' or $request->input('cache') == 1);
         $content_type_object->save();
         $content_type_object->contents()->saveMany([$content]);
+        $content->save();
 
         return $content;
     }
 
     public function create(Request $request, $content_type)
     {
-        $this->validate($request, $this->getCreationConstraints());
+        $content_type_class = static::contentTypeParse($content_type);
+        $this->validate($request, $content_type_class::getCreationConstraints());
 
-        return response()->json($this->saveFromRequest( new Content(), $request, $content_type));
+        return response()->json($this->saveFromRequest( new Content(), $request, $content_type_class));
     }
 
     public function delete($id)
@@ -111,8 +85,10 @@ class ContentController extends Controller
 
     public function update(Request $request, $id)
     {
-        $this->validate($request, $this->getUpdateConstraints());
         $content = Content::findOrFail($id);
+        $content_type_object = $content->contained()->first();
+        $content_type_class = get_class($content_type_object);
+        $this->validate($request, $content_type_class::getUpdateConstraints());
         if ($content->application_id != $this->getApplication()->id) {
             throw new ForbiddenAccessException();
         }
