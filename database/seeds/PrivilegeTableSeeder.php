@@ -79,6 +79,11 @@ class PrivilegeTableSeeder extends Seeder
             'description' => 'Get the geolocation of a list of subscribed application users',
             'controller_action' => 'App\Http\Controllers\GeolocationController@getFromUsers',
         ]);
+        Privilege::create([
+            'name' => 'application:get_granted_privileges',
+            'description' => 'Get the list of granted privileges from the atuhenticated application.',
+            'controller_action' => 'App\Http\Controllers\ApplicationController@getGrantedPrivileges',
+        ]);
     }
 
 }

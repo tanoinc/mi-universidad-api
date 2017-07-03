@@ -49,6 +49,7 @@ $app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers','middle
 
     // Application privileges
     $app->get('application/{id}/granted_privileges','ApplicationController@getApplicationGrantedPrivileges');
+    $app->get('application/granted_privileges','ApplicationController@getGrantedPrivileges');
     
     // Content: Generic content CRUD
     $app->get('content','ContentController@index');
