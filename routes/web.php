@@ -48,8 +48,8 @@ $app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers','middle
     //$app->delete('application/{id}','ApplicationController@deleteApplication');
 
     // Application privileges
-    $app->get('application/{id}/granted_privileges','ApplicationController@getApplicationGrantedPrivileges');
-    $app->get('application/granted_privileges','ApplicationController@getGrantedPrivileges');
+    $app->get('privileges/granted/application/{id}','ApplicationController@getApplicationGrantedPrivileges');
+    $app->get('privileges/granted','ApplicationController@getGrantedPrivileges');
     
     // Content: Generic content CRUD
     $app->get('content','ContentController@index');

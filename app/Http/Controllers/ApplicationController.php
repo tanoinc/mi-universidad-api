@@ -42,9 +42,7 @@ class ApplicationController extends Controller
 
     public function getGrantedPrivileges()
     {
-        $application = Application::findOrFail($this->getApplication()->id);
-
-        return response()->json($application->granted_privileges);
+        return $this->getApplicationGrantedPrivileges($this->getApplication()->id);
     }        
     
     public function createApplication(Request $request)

@@ -25,6 +25,8 @@ class Privilege extends Model
         'name', 'description','controller_action'
     ];
     
+    protected $hidden = ['pivot', 'created_at', 'updated_at', 'id', 'controller_action'];
+    
     public function scopeFindByName($query, $name)
     {
         return $query->where('name', '=', $name);
