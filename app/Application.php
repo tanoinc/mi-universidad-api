@@ -20,7 +20,7 @@ class Application extends Model
 
     protected $table = 'application';
     protected $fillable = [
-        'name', 'description',
+        'name', 'description', 'auth_callback_url', 'auth_required'
     ];
     protected $hidden = [
         'id', 'api_key', 'deleted_at', 'updated_at', 'api_secret', 'pivot', 'auth_callback_url'
@@ -126,4 +126,24 @@ class Application extends Model
             });
     }    
     
+    public function generate_api_hashes()
+    {
+        $this->generate_api_key();
+        $this->generate_api_secret();
+    }
+    
+    public function generate_api_key()
+    {
+        $this->api_key = static::generate_hash();
+    }
+    
+    public function generate_api_secret()
+    {
+        $this->api_secret = static::generate_hash();
+    }
+    
+    protected static function generate_hash()
+    {
+        return sha1(random_bytes(8).microtime());
+    }
 }

@@ -47,7 +47,17 @@ class ApplicationController extends Controller
     
     public function createApplication(Request $request)
     {
-        $application = Application::create($request->all());
+        $this->validate($request, [
+            'name' => 'required|unique:application',
+            'description' => 'required|max:255',
+            'auth_callback_url' => 'url',
+            'auth_required' => 'boolean'
+        ]);
+        $application = new Application();
+        $application->fill($request->all());
+        $application->generate_api_hashes();
+        $application->privilege_version = null;
+        $application->save();
 
         return response()->json($application);
     }
