@@ -70,7 +70,12 @@ class UserApplication extends Model
     
     public function generateSubscriptionToken() {
         $this->granted_privilege_version = null;
-        return $this->subscription_token = sha1(random_bytes(8).microtime());
+        return $this->subscription_token = static::generate_hash();
+    }
+    
+    protected static function generate_hash()
+    {
+        return sha1(random_bytes(8).microtime());
     }
     
     public function grant(Application $app) {

@@ -7,9 +7,9 @@
  */
 
 use Illuminate\Database\Seeder;
-use Illuminate\Database\Eloquent\Model;
 use App\Application;
 use App\Privilege;
+
 /**
  * The Application table seeder
  *
@@ -25,25 +25,22 @@ class ApplicationTableSeeder extends Seeder
      */
     public function run()
     {
-        $app = Application::create([
-            'name' => env('MOBILE_APP_NAME'),
-            'description' => env('MOBILE_APP_NAME').' mobile app',
-            'api_key'  => sha1(random_bytes(8).microtime()),
-            'api_secret'  => sha1(random_bytes(8).microtime()),
+        $this->createApp(env('MOBILE_APP_NAME'));
+        $this->createApp('auth-test-app', true, 'http://localhost:8803/mi_universidad_conectar');
+    }
+
+    protected function createApp($app_name, $auth_required = false, $callback_url = null)
+    {
+        $app = new Application();
+        $app->fill([
+            'name' => $app_name,
+            'description' => $app_name . ' mobile app',
             'privilege_version' => 1,
+            'auth_required' => $auth_required,
+            'auth_callback_url' => $callback_url,
         ]);
-        $all_privileges = Privilege::all();
-        $app->privileges()->attach($all_privileges);
-        
-        $app = Application::create([
-            'name' => "auth-test-app",
-            'description' => "Auth mobile app",
-            'api_key' => sha1(random_bytes(8).microtime()),
-            'api_secret' => sha1(random_bytes(8).microtime()),
-            'privilege_version' => 1,
-            'auth_required' => true,
-            'auth_callback_url' => 'http://localhost:8803/mi_universidad_conectar',
-        ]);
+        $app->generate_api_hashes();
+        $app->save();
         $all_privileges = Privilege::all();
         $app->privileges()->attach($all_privileges);
     }

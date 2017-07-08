@@ -16,6 +16,9 @@ class PrivilegeLevel extends Migration
         Schema::table('privilege', function (Blueprint $table) {
             $table->enum('level', ['user', 'application'])->default('user');
         });
+        Schema::table('application', function (Blueprint $table) {
+            $table->integer('privilege_version')->default(1)->nullable()->change();
+        });
     }
 
     /**
@@ -28,5 +31,8 @@ class PrivilegeLevel extends Migration
         Schema::table('privilege', function (Blueprint $table) {
             $table->dropColumn('level');
         });
+        Schema::table('application', function (Blueprint $table) {
+            $table->integer('privilege_version')->default(1)->change();
+        });           
     }
 }

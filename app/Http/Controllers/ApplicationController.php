@@ -97,10 +97,9 @@ class ApplicationController extends Controller
 
         return response()->json($applications);
     }
-    public function add(Request $request)
+    public function subscribe(Request $request)
     {
         $app = Application::findByName($request->input('application_name'))->firstOrFail();
-        //$application_subscription = new \App\UserApplication();
         $application_subscription = \App\UserApplication::firstOrNew(['application_id'=>$app->id, 'user_id'=>Auth::user()->id]);
         $application_subscription->application_id = $app->id;
         $application_subscription->user_id = Auth::user()->id;
@@ -113,6 +112,15 @@ class ApplicationController extends Controller
             $application_subscription->save();
             return response()->json($app);
         }
+    }
+    
+    public function unsubscribe($application_name)
+    {
+        $app = Application::findByName($application_name)->firstOrFail();
+        $application_subscription = \App\UserApplication::findByApplicationAndUser( $app, Auth::user() )->firstOrFail();
+        $application_subscription->delete();
+        
+        return response()->json($application_subscription);
     }
     
     public function updateSubscription(Request $request, $id, $token) 

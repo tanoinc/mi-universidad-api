@@ -68,7 +68,8 @@ $app->group(['prefix' => 'mobile/api/v1','namespace' => '\App\Http\Controllers',
     // Applications
     $app->get('application','ApplicationController@getFromAuthenticatedUser');
     $app->get('application/available','ApplicationController@getAvailable');
-    $app->post('application/subscription', 'ApplicationController@add');
+    $app->post('application/subscription', 'ApplicationController@subscribe');
+    $app->delete('application/subscription/{application_name}', 'ApplicationController@unsubscribe');
     $app->get('application/content','ContentController@getFromAuthenticatedUser');
     $app->get('application/content/{application_name}','ContentController@getFromApplication');
 
