@@ -32,8 +32,11 @@ class Context extends Model
         return $this->belongsToMany('App\User', 'context_user_subscription');
     }
 
-    public static function findByName(Application $app, $context_name)
+    public static function findByName(Application $app, $context_name, $format = false)
     {
+        if ($format) {
+            $context_name = static::formatContextName($context_name);
+        }
         return $app->contexts()->where('name', '=', $context_name);
     }
 
@@ -53,11 +56,26 @@ class Context extends Model
         $this->description = str_replace(array('-', '_'), ' ', ucfirst(strtolower($value)));
     }
 
-    public static function create(Application $app, $context_name)
+    public static function formatContextName($context_name) 
+    {
+        $context_name = preg_replace('~[^\\pL0-9_]+~u', '-', $context_name);
+        $context_name = trim($context_name, "-");
+        $context_name = iconv("utf-8", "us-ascii//TRANSLIT", $context_name);
+        $context_name = strtolower($context_name);
+        $context_name = preg_replace('~[^-a-z0-9_]+~', '', $context_name);
+        return $context_name;
+    }
+
+    public static function create(Application $app, $context_name, $context_description = null)
     {
         $context = new Context();
-        $context->name = $context_name;
+        $context->name = static::formatContextName($context_name);
         $context->application_id = $app->id;
+        if ($context_description) {
+            $context->description = $context_description;
+        } else {
+            $context->description = $context_name;
+        }
         if ($context->save()) {
 
             return $context;

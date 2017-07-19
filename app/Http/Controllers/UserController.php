@@ -51,8 +51,9 @@ class UserController extends Controller
     public function registerPushToken(Request $request)
     {
         \Illuminate\Support\Facades\Log::debug(sprintf('register push token: user_id:[%s] token [%s], type [%s]', Auth::user()->id, $request->input('token'), $request->input('type')));
-        $push_token = UserPushToken::firstOrNew(['token'=>$request->input('token'), 'type' => $request->input('type')]);
-        $push_token->user_id = Auth::user()->id;
+        $push_token = UserPushToken::firstOrNew([ 'user_id' => Auth::user()->id ]);
+        $push_token->token = $request->input('token');
+        $push_token->type = $request->input('type');
         $push_token->touch();
         
         return response()->json($push_token->save());
@@ -60,9 +61,7 @@ class UserController extends Controller
 
     public function unregisterPushToken($token, $type)
     {
-        $push_token = UserPushToken::where('token', $token)
-            ->where('type', $type)
-            ->where('user_id', Auth::user()->id)->firstOrFail();
+        $push_token = UserPushToken::where('user_id', Auth::user()->id)->firstOrFail();
         $push_token->delete();
         
         return $push_token;

@@ -20,7 +20,7 @@ class Notification extends Model
         'read_date', 'notifiable_type'
     ];
     protected $hidden = [
-        'id', 'deleted_at', 'updated_at', 'user_id', 'notifiable_id'
+        'id', 'deleted_at', 'updated_at', 'user_id', 'notifiable_id', 'push_data_uuid'
     ];
 
     public function user()

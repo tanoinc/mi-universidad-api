@@ -28,12 +28,26 @@ class CalendarEventController extends AbstractInformationController
     {
         return 'calendar_event';
     }
+    
+    protected function getValidationRules()
+    {
+        $rules = parent::getValidationRules();
+        $rules['event_description'] = 'max:255';
+        $rules['event_name'] = 'required|max:150';
+        $rules['event_date'] = 'required|date';
+        $rules['event_location'] = 'max:150';
+        $rules['event_duration'] = 'date_format:H:i:s';
+        
+        return $rules;
+    }
 
     protected function setModelDataFromRequest(\App\AbstractInformation $calendar_event, \Illuminate\Http\Request $request)
     {
         $calendar_event->event_name = $request->input('event_name');
         $calendar_event->event_date = $request->input('event_date');
         $calendar_event->event_duration = $request->input('event_duration');
+        $calendar_event->event_description = $request->input('event_description');
+        $calendar_event->event_location = $request->input('event_location');
 
         return $calendar_event;
     }

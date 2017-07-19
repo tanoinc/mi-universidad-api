@@ -26,6 +26,7 @@ class ApiKeyMiddleware
      */
     public function handle($request, Closure $next)
     {
+        //Log::debug(sprintf('Signature: %s.', json_encode(getallheaders() )));
         $raw_auth_data = $request->header('Authorization');
         if (empty($raw_auth_data)) {
             throw new UnauthorizedAccessException();
@@ -84,7 +85,7 @@ class ApiKeyMiddleware
     protected function isValidRequest($request)
     {
         $hash = hash_hmac($this->getHmacHashFunction(), $this->getHmacContent($request), $this->getApplication()->api_secret);
-        Log::debug(sprintf('Signature: Expected [%s], Received [%s]', $hash, $this->auth_signature));
+        Log::debug(sprintf('Signature: Expected [%s], Received [%s]: %s.', $hash, $this->auth_signature, $this->getHmacContent($request)));
         //Log::debug(sprintf('data: %s', $this->getHmacContent($request)));
 
         return ($hash == $this->auth_signature);

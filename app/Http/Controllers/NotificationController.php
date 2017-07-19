@@ -11,7 +11,7 @@ class NotificationController extends Controller
     
     protected function getFromUser(User $user)
     {
-        $newsfeeds = Notification::fromUser($user)->with(['notifiable'])->orderBy('created_at','desc')->simplePaginate(env('ITEMS_PER_PAGE_DEFAULT',20));
+        $newsfeeds = Notification::fromUser($user)->with(['notifiable','notifiable.context'])->orderBy('created_at','desc')->simplePaginate(env('ITEMS_PER_PAGE_DEFAULT',20));
 
         return response()->json($newsfeeds);
     }

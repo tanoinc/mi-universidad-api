@@ -116,11 +116,12 @@ abstract class AbstractInformationController extends Controller
     }
     protected function setFromRequest(AbstractInformation $information, Request $request)
     {
+        $this->validate($request, $this->getValidationRules());
         $information->application_id = $this->getApplication()->id;
         $information->send_notification = ($request->input('send_notification')?1:0);
         $information->global = ($request->input('global')?1:0);
         if ($request->has('context_name')) {
-            $information->context_id = $this->getContext($this->getApplication(), $request->input('context_name'))->id;
+            $information->context_id = $this->getContext($this->getApplication(), $request->input('context_name'), ($request->has('context_description')?$request->input('context_description'):null) )->id;
         }
         
         return $this->setModelDataFromRequest($information, $request);
@@ -128,14 +129,22 @@ abstract class AbstractInformationController extends Controller
     
     abstract protected function setModelDataFromRequest(AbstractInformation $information, Request $request);
 
-    protected function getContext(Application $app, $context_name)
+    protected function getContext(Application $app, $context_name, $context_description = null)
     {
-        $context = Context::findByName($app, $context_name)->first();
+        $context = Context::findByName($app, $context_name, true)->first();
         if (!$context) {
-            $context = Context::create($app, $context_name);
+            $context = Context::create($app, $context_name, $context_description);
         }
 
         return $context;
+    }
+    
+    protected function getValidationRules()
+    {
+       return [
+           'context_name' => 'alpha_dash|max:150',
+           'context_description' => 'max:255',
+       ];
     }
 
 }
