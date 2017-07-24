@@ -98,6 +98,7 @@ $app->group(['prefix' => 'mobile/api/v1','namespace' => '\App\Http\Controllers',
     $app->get('user','UserController@getFromAuthenticatedUser');
     $app->post('user/push_token','UserController@registerPushToken');
     $app->delete('user/push_token/{type}/{token}','UserController@unregisterPushToken');
+    $app->post('user/location','UserController@registerLocation');
     
     // Contents
     $app->get('content','ContentController@getFromAuthenticatedUser');

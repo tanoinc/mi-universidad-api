@@ -66,5 +66,17 @@ class UserController extends Controller
         
         return $push_token;
     }
-
+    
+    public function registerLocation(Request $request)
+    {
+        \Illuminate\Support\Facades\Log::debug(sprintf('register location: user_id:[%s] coord [%s]', Auth::user()->id, json_encode($request->input('coords'))));
+        $user_id = Auth::user()->id;
+        $geolocation = \App\Geolocation::firstOrNew(['user_id' => $user_id]);
+        $data = $request->all();
+        $geolocation->fill($data['coords']);
+        $geolocation->user_id = $user_id;
+        $geolocation->touch();
+        
+        return response()->json($geolocation->save());
+    }
 }
