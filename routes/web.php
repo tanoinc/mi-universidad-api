@@ -24,6 +24,9 @@ $app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers'], funct
     
     // User
     $app->post('user','UserController@createUser');
+    
+    //facebook login
+    $app->post('auth/facebook','ExternalAuthController@facebook');
 });
 
 // Server-side apps (api-key + signature)

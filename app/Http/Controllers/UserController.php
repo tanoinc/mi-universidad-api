@@ -24,6 +24,7 @@ class UserController extends Controller
 
     protected function getCreationConstraints()
     {
+        //@TODO: Validar que los campos de email y usuario sean unicos respecto del "origen" (solo para app móvil, en la registracion)
         return [
             'email' => 'required|email|unique:user|unique:user,username|max:255',
             'username' => 'required|alpha_dash|unique:user|unique:user,email|max:255',

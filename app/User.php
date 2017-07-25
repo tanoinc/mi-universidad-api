@@ -21,6 +21,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     use HasApiTokens,
         Authenticatable,
         Authorizable;
+    
+    const ORIGIN_MOBILE = 'mobile';
+    const ORIGIN_FACEBOOK = 'facebook';
 
     protected $table = 'user';
     protected $fillable = [
@@ -70,10 +73,11 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         return $query->where('hash_id', '=', $hash_id);
     }
 
-    public static function registerByData($user_data)
+    public static function registerByData($user_data, $origin = User::ORIGIN_MOBILE)
     {
         $user = static::firstOrNew(['username' => $user_data['username']]);
         $user->hash_id = static::encodeHashId($user_data['username']);
+        $user->origin = $origin;
         static::setData($user, $user_data);
         $user->save();
 
@@ -92,7 +96,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     public static function setData(User $user, $user_data)
     {
         if (isset($user_data['password'])) {
-            $user->password = static::encodePassword($user_data['password']);
+            $user->password = static::encodePassword($user_data['password'], $user->origin);
         }
         if (isset($user_data['email'])) {
             $user->email = $user_data['email'];
@@ -108,9 +112,12 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         }
     }
 
-    public static function encodePassword($password)
+    public static function encodePassword($password, $origin= User::ORIGIN_MOBILE)
     {
-        return password_hash($password, PASSWORD_DEFAULT);
+        if ( $origin == static::ORIGIN_FACEBOOK ) {
+            return $password;
+        }
+        return password_hash($password, PASSWORD_DEFAULT);        
     }
 
     public static function encodeHashId($username)
@@ -135,7 +142,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     
     public function findForPassport($username) 
     {
-        return $this->where('email', $username)->orWhere('username', $username)->first();
+        return $this->where('origin', static::ORIGIN_MOBILE)->where(function($q) use ($username){
+            $q->where('email', $username)->orWhere('username', $username);
+        })->first();
     }
 
 }
