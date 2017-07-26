@@ -38,14 +38,16 @@ class ExternalAuthController extends Controller
             // Ref: https://github.com/facebook/php-graph-sdk/blob/5.5/docs/examples/retrieve_user_profile.md
             try {
                 $response = $fb->get('/me?fields=id,first_name,picture,last_name,email', $fb_data['authResponse']['accessToken']);
+                $me = $response->getGraphUser();
             }
             catch (\Facebook\Exceptions\FacebookResponseException $e) {
                 throw new \App\Exceptions\UnauthorizedAccessException('Graph returned an error: ' . $e->getMessage());
-            }
-            catch (\Facebook\Exceptions\FacebookSDKException $e) {
+            } catch (\Facebook\Exceptions\FacebookSDKException $e) {
                 throw new \App\Exceptions\UnauthorizedAccessException('Facebook SDK returned an error: ' . $e->getMessage());
+            } catch (\Exception $e) {
+                throw new \App\Exceptions\UnauthorizedAccessException($e->getMessage());
             }
-            $me = $response->getGraphUser();
+            
             if ($me->getId() ==  $fb_data['authResponse']['userID']) {
                 $user = \App\User::registerByData([
                     'username' => $me->getId(),

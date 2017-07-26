@@ -75,7 +75,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
     public static function registerByData($user_data, $origin = User::ORIGIN_MOBILE)
     {
-        $user = static::firstOrNew(['username' => $user_data['username']]);
+        $user = static::firstOrNew(['username' => $user_data['username'], 'origin' => $origin ]);
         $user->hash_id = static::encodeHashId($user_data['username']);
         $user->origin = $origin;
         static::setData($user, $user_data);

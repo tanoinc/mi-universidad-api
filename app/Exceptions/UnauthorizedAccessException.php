@@ -21,7 +21,7 @@ class UnauthorizedAccessException extends GenericErrorException
     }
     public function getCustomMessage()
     {
-        return trim("Authorization header missing or invalid. ".$this->getMessage());
+        return trim("Authorization invalid. ".$this->getMessage());
     }
     public function getStatusCode()
     {
