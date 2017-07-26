@@ -52,11 +52,11 @@ class UserController extends Controller
     public function registerPushToken(Request $request)
     {
         \Illuminate\Support\Facades\Log::debug(sprintf('register push token: user_id:[%s] token [%s], type [%s]', Auth::user()->id, $request->input('token'), $request->input('type')));
-        $push_token = UserPushToken::firstOrNew([ 'user_id' => Auth::user()->id ]);
+        $push_token = UserPushToken::firstOrNew([ 'user_id' => Auth::user()->id]);
         $push_token->token = $request->input('token');
         $push_token->type = $request->input('type');
         $push_token->touch();
-        
+
         return response()->json($push_token->save());
     }
 
@@ -64,20 +64,24 @@ class UserController extends Controller
     {
         $push_token = UserPushToken::where('user_id', Auth::user()->id)->firstOrFail();
         $push_token->delete();
-        
+
         return $push_token;
     }
-    
+
     public function registerLocation(Request $request)
     {
-        \Illuminate\Support\Facades\Log::debug(sprintf('register location: user_id:[%s] coord [%s]', Auth::user()->id, json_encode($request->input('coords'))));
+        \Illuminate\Support\Facades\Log::debug(sprintf('register location: user_id:[%s] input [%s]', Auth::user()->id, json_encode($request->all())));
         $user_id = Auth::user()->id;
         $geolocation = \App\Geolocation::firstOrNew(['user_id' => $user_id]);
         $data = $request->all();
-        $geolocation->fill($data['coords']);
-        $geolocation->user_id = $user_id;
-        $geolocation->touch();
-        
-        return response()->json($geolocation->save());
+        if (isset($data['coords'])) {
+            $geolocation->fill($data['coords']);
+            $geolocation->user_id = $user_id;
+            $geolocation->touch();
+
+            return response()->json($geolocation->save());
+        }
+        return response()->json(false);
     }
+
 }
