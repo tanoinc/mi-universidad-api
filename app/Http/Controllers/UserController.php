@@ -55,6 +55,7 @@ class UserController extends Controller
         $push_token = UserPushToken::firstOrNew([ 'user_id' => Auth::user()->id]);
         $push_token->token = $request->input('token');
         $push_token->type = $request->input('type');
+        $push_token->user_id = Auth::user()->id;
         $push_token->touch();
 
         return response()->json($push_token->save());
