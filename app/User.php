@@ -9,6 +9,7 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use \Laravel\Passport\HasApiTokens;
 use App\User;
+use App\Application;
 
 /**
  * Represents the "mi-universidad" users.
@@ -80,7 +81,10 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         $user->origin = $origin;
         static::setData($user, $user_data);
         $user->save();
-
+        
+        $app = Application::findByName(env('MOBILE_APP_NAME'))->firstOrFail();
+        $user->applications()->attach($app, ['granted_privilege_version' => $app->privilege_version, 'external_id' => $user->id]);
+        
         return $user;
     }
 

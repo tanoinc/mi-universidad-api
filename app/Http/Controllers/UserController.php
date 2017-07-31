@@ -10,7 +10,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\User;
-use App\Application;
 use Illuminate\Support\Facades\Auth;
 use App\UserPushToken;
 
@@ -38,8 +37,6 @@ class UserController extends Controller
     {
         $this->validate($request, $this->getCreationConstraints());
         $user = User::registerByData($request->all());
-        $app = Application::findByName(env('MOBILE_APP_NAME'))->firstOrFail();
-        $user->applications()->attach($app, ['granted_privilege_version' => $app->privilege_version, 'external_id' => $user->id]);
 
         return response()->json($user);
     }
