@@ -80,6 +80,7 @@ $app->group(['prefix' => 'mobile/api/v1','namespace' => '\App\Http\Controllers',
 
     // Notifications
     $app->get('notification','NotificationController@getFromAuthenticatedUser');
+    $app->post('notification/read','NotificationController@read');
     
     // Newsfeed
     $app->get('newsfeed','NewsfeedController@getFromAuthenticatedUser');

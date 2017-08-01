@@ -15,6 +15,10 @@ class Notification extends Model
 
     const NOTIFY_ALL_USERS = "NOTIFY_ALL_USERS";
     
+    const TYPE_NEWSFEED = 'App\Newsfeed';
+    const TYPE_CALENDAR_EVENT = 'App\CalendarEvent';
+    const TYPES = array(Notification::TYPE_CALENDAR_EVENT, Notification::TYPE_NEWSFEED);
+    
     protected $table = 'notification';
     protected $fillable = [
         'read_date', 'notifiable_type'
@@ -33,8 +37,21 @@ class Notification extends Model
         return $this->morphTo();
     }
     
+    public function read()
+    {
+        if (!$this->read_date) {
+            $this->read_date = new \DateTime();
+        }
+        return $this;
+    }
+
+
     public function scopeFromUser($query, User $user)
     {
         return $query->where('user_id', $user->id);
     }
+    public function scopeFromUserAndNotifiable($query, User $user, $notifiable_type, $notifiable_id)
+    {
+        return $query->where('user_id', $user->id)->where('notifiable_type', $notifiable_type)->where('notifiable_id', $notifiable_id);
+    }    
 }
