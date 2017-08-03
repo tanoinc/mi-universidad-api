@@ -31,18 +31,13 @@ class ApplicationTableSeeder extends Seeder
 
     protected function createApp($app_name, $auth_required = false, $callback_url = null)
     {
-        $app = new Application();
-        $app->fill([
+        return Application::create([
             'name' => $app_name,
             'description' => $app_name . ' mobile app',
             'privilege_version' => 1,
             'auth_required' => $auth_required,
             'auth_callback_url' => $callback_url,
         ]);
-        $app->generate_api_hashes();
-        $app->save();
-        $all_privileges = Privilege::all();
-        $app->privileges()->attach($all_privileges);
     }
 
 }

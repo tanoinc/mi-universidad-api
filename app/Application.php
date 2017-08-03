@@ -146,4 +146,26 @@ class Application extends Model
     {
         return sha1(random_bytes(8).microtime());
     }
+    
+    public function setFromArray($array_data)
+    {
+        $this->name = $array_data['name'];
+        $this->description = $array_data['description'];
+        $this->auth_required = $array_data['auth_required'];
+        $this->auth_callback_url = $array_data['auth_callback_url'];
+    }
+    
+    public static function create($array_data, $privileges = null) {
+        $app = new Application();
+        $app->privilege_version = 1;
+        $app->setFromArray($array_data);
+        $app->generate_api_hashes();
+        $app->save();
+        if (!$privileges) {
+            $privileges = Privilege::levelUser()->get();
+            $privileges = $privileges->merge(Privilege::levelApplication()->get());
+        }
+        $app->privileges()->attach($privileges);
+        return $app;
+    }
 }

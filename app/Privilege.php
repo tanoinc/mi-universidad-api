@@ -18,6 +18,8 @@ class Privilege extends Model
 {
     const NEWSFEED_SEND_NOTIFICATION = 'newsfeed:send_notification';
     const CALENDAR_EVENT_SEND_NOTIFICATION = 'calendar_event:send_notification';
+    const LEVEL_USER = 'user';
+    const LEVEL_APPLICATION = 'application';
     
     protected $table = 'privilege';
 
@@ -34,5 +36,17 @@ class Privilege extends Model
     public function scopeFindByAction($query, $name)
     {
         return $query->where('controller_action', '=', $name);
+    }
+    public function scopeLevel($query, $level)
+    {
+        return $query->where('level', '=', $level);
+    }
+    public function scopeLevelUser($query)
+    {
+        return $this->scopeLevel($query, static::LEVEL_USER);
+    }
+    public function scopeLevelApplication($query)
+    {
+        return $this->scopeLevel($query, static::LEVEL_APPLICATION);
     }
 }

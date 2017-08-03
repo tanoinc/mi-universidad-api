@@ -38,25 +38,39 @@ class ApplicationController extends Controller
         $application = Application::findOrFail($id);
 
         return response()->json($application->granted_privileges);
-    }    
+    }
 
     public function getGrantedPrivileges()
     {
         return $this->getApplicationGrantedPrivileges($this->getApplication()->id);
-    }        
-    
-    public function createApplication(Request $request)
+    }
+
+    protected function getValidationRules()
     {
-        $this->validate($request, [
-            'name' => 'required|unique:application',
+        return [
+            'name' => 'required|alpha_dash|unique:application',
             'description' => 'required|max:255',
             'auth_callback_url' => 'url',
             'auth_required' => 'boolean'
-        ]);
-        $application = new Application();
-        $application->fill($request->all());
-        $application->generate_api_hashes();
-        $application->privilege_version = null;
+        ];
+    }
+
+    public function newFromRequest(\Illuminate\Http\Request $request)
+    {
+        $application = Application::create($request->all());
+
+        return $application;
+    }
+
+    public function setFromRequest(\Illuminate\Http\Request $request, Application $application)
+    {
+        $application->setFromArray($request->all());
+    }
+
+    public function createApplication(Request $request)
+    {
+        $this->validate( $request, $this->getValidationRules() );
+        $application = $this->newFromRequest($request);
         $application->save();
 
         return response()->json($application);
@@ -65,17 +79,15 @@ class ApplicationController extends Controller
     public function deleteApplication($id)
     {
         $application = Application::findOrFail($id);
-        $application->delete();
 
-        return response()->json('deleted');
+        return response()->json( $application->delete() );
     }
 
     public function updateApplication(Request $request, $id)
     {
+        $this->validate( $request, $this->getValidationRules() );
         $application = Application::findOrFail($id);
-        $application->name = $request->input('name');
-        $application->description = $request->input('description');
-        $application->secret_token = $request->input('secret_token');
+        $this->setFromRequest($request);
         $application->save();
 
         return response()->json($application);
@@ -84,54 +96,56 @@ class ApplicationController extends Controller
     protected function getFromUser(User $user)
     {
         $search_value = $this->getSearchValue();
-        $applications = $user->subscribed_applications()->search($search_value)->simplePaginate(env('ITEMS_PER_PAGE_DEFAULT',20));
+        $applications = $user->subscribed_applications()->search($search_value)->simplePaginate(env('ITEMS_PER_PAGE_DEFAULT', 20));
 
         return response()->json($applications);
     }
-    
+
     public function getAvailable(Request $request)
     {
         $search_value = $this->getSearchValue();
         $applications = Application::search($search_value)->notSubscribedBy(Auth::user())
-                ->paginate(env('ITEMS_PER_PAGE_DEFAULT',20));
+                ->paginate(env('ITEMS_PER_PAGE_DEFAULT', 20));
 
         return response()->json($applications);
     }
+
     public function subscribe(Request $request)
     {
         $app = Application::findByName($request->input('application_name'))->firstOrFail();
-        $application_subscription = \App\UserApplication::firstOrNew(['application_id'=>$app->id, 'user_id'=>Auth::user()->id]);
+        $application_subscription = \App\UserApplication::firstOrNew(['application_id' => $app->id, 'user_id' => Auth::user()->id]);
         $application_subscription->application_id = $app->id;
         $application_subscription->user_id = Auth::user()->id;
         if ($app->auth_callback_url != '' and $app->auth_required) {
             $token = $application_subscription->generateSubscriptionToken();
             $application_subscription->save();
-            return response()->json(['url_redirect'=>$app->auth_callback_url.'?id='.Auth::user()->hash_id.'&token='.$token]);
-        } else {
+            return response()->json(['url_redirect' => $app->auth_callback_url . '?id=' . Auth::user()->hash_id . '&token=' . $token]);
+        }
+        else {
             $application_subscription->grant($app);
             $application_subscription->save();
             return response()->json($app);
         }
     }
-    
+
     public function unsubscribe($application_name)
     {
         $app = Application::findByName($application_name)->firstOrFail();
-        $application_subscription = \App\UserApplication::findByApplicationAndUser( $app, Auth::user() )->firstOrFail();
+        $application_subscription = \App\UserApplication::findByApplicationAndUser($app, Auth::user())->firstOrFail();
         $application_subscription->delete();
-        
+
         return response()->json($application_subscription);
     }
-    
-    public function updateSubscription(Request $request, $id, $token) 
+
+    public function updateSubscription(Request $request, $id, $token)
     {
         $user = User::findByHashId($id)->firstOrFail();
         $application_subscription = \App\UserApplication::findForSubscription($this->getApplication(), $user, $token)->firstOrFail();
         $application_subscription->external_id = $request->input('external_id');
         $application_subscription->grant($this->getApplication());
         $application_subscription->save();
-        
+
         return response()->json($application_subscription);
-        
     }
+
 }
