@@ -17,9 +17,18 @@ tags:
   description: Operaciones relacionadas con las novedades en el newsfeed de la aplicación móvil
 - name: calendario
   description: Operaciones sobre los eventos del calendario
+- name: contenido
+  description: "Operaciones sobre los contenidos de los servicios: mapas de google y texto"
+  
 securityDefinitions:
   api_key:
-    description: "Agrega el siguiente encabezado HTTP: Authorization: APIKEY {api_key}:{firma}. {api_key} es la identificación del servicio otorgado y {firma} es el contenido firmado con la clave secreta (api secret). Se utiliza HMAC con sha256 sobre todo el contenido de la solicitud, de la siguiente forma:"
+    description: |
+      Agrega el siguiente encabezado HTTP: Authorization: APIKEY {api_key}:{firma}. {api_key} es la identificación del servicio otorgado y {firma} es el contenido firmado con la clave secreta (api secret). Se utiliza HMAC con sha256 sobre todo el contenido de la solicitud, de la siguiente forma:
+      
+        Por ejemplo, para una solicitud por POST, a /api/v1/newsfeed con el contenido: {"title":"Nuevo mensaje personal","content":"Contenido del mensaje","global":"0","send_notification":"1","users":["3"]}
+        
+        Se debe generar la firma con HMAC y sha256 en base al siguiente contenido:
+        {"full_url":"http:\/\/localhost\/api\/v1\/newsfeed","method":"post","input":{"title":"Nuevo mensaje personal","content":"Contenido del mensaje","global":"0","send_notification":"1","users":["3"]}}.
     type: apiKey
     name: Authorization
     in: header
@@ -92,6 +101,39 @@ paths:
           description: "Error de validación"
         500:
           description: "Errores varios. Ver detalle en respuesta"
+  /content/google_map:
+    post:
+      summary: "Crea un contenido de mapa de Google"
+      description: "Crea un nuevo contenido de tipo mapa, que aparecerá en el menú principal, asociado al servicio (subaplicación añadida dentro de la aplicación 'Mi Universidad')"
+      consumes:
+      - application/json
+      - application/x-www-form-urlencoded
+      produces:
+      - application/json
+      tags:
+      - contenido
+      parameters:
+      - in: body
+        name: body
+        description: Atributos del evento a crear
+        required: true
+        schema:
+          $ref: '#/definitions/content_post'
+      responses:
+        200:
+          description: "Contenido creado"
+          schema:
+            $ref: '#/definitions/newsfeed_post_response'
+        401:
+          description: "No autorizado"          
+        403:
+          description: "Acceso prohibido"
+        422:
+          description: "Error de validación"
+        500:
+          description: "Errores varios. Ver detalle en respuesta"
+          schema:
+            $ref: '#/definitions/error'
 
     get:
       tags:
@@ -133,6 +175,20 @@ paths:
           description: bad input parameter
 
 definitions:
+  error:
+    type: object
+    properties:
+      error:
+        type: integer
+        example: 3
+        description: "Número de error"
+      message:
+        type: string
+        example: "Authorization invalid. Application not found."
+      data:
+        type: object
+        example: null
+        description: "Datos adicionales al error. Por ejemplo en una validación, los campos inválidos."
   newsfeed:
     type: object
     properties:
@@ -337,7 +393,48 @@ definitions:
         example: "Matemática I"
         description: "Opcional (si se utiliza, 'context_name' es requerido). Descripción del contexto, asociada al nombre único (context_name)."
         
-        
+
+  content_post:
+    type: object
+    required: 
+    - name
+    - description
+    - url
+    properties:
+      name:
+        type: string
+        example: "Lugares de interés"
+        maxLength: 50
+      description:
+        type: string
+        maxLength: 255
+        example: "Lugares interesantes para visitar en el campus de la Universidad"
+      url:
+        type: string
+        example: "http://localhost/obtener_marcadores"
+        description: "URL desde donde se cargará la información del mapa: marcadores, centro, polylines"
+      icon_name:
+        type: string
+        example: "map"
+        description: "Nombre del ícono que figurará en el menú de la aplicación relacionado con el contenido. Ver íconos de Ionic."
+      order:
+        type: integer
+        example: 200
+        description: "Número que representa el órden en el que aparecerá en el menú (órden ascendente por este valor)"
+      cache:
+        type: boolean
+        example: true
+        description: "Actualmente no utilizado. Indica si debe guardar en caché el contenido cargado de la url inidcada en 'url'"
+      cache_expiration:
+        type: string
+        example: "2017-07-01 00:00:00"
+        description: "Actualmente no utilizado. Fecha de expiración de caché"
+      send_user_info:
+        type: boolean
+        example: false
+        description: "Indica si debe enviar información del usuario al solicitar el contenido del 'url'. Si es verdadero, la solicitud se hará por POST y se enviará el ID de usuario del servicio (si existiera) y su ubicación geográfica."
+
+
   InventoryItem:
     type: object
     required:
