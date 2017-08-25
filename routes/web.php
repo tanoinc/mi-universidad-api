@@ -19,16 +19,16 @@ $app->get('/', function () use ($app) {
 $app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers'], function($app)
 {
     $app->get('config/init','ConfigurationController@initialConfig');
-    
+
     $app->get('config/service_status','ConfigurationController@serviceStatus');
-    
+
     // User
     $app->post('user','UserController@createUser');
-    
+
     //facebook login
     //$app->post('auth/facebook','ExternalAuthController@facebook');
     $app->post('auth/facebook','ExternalAccessTokenController@issueToken');
-    
+
 });
 
 // Server-side apps (api-key + signature)
@@ -36,14 +36,14 @@ $app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers','middle
 {
     // Newsfeed
     $app->post('newsfeed','NewsfeedController@create');
-    $app->get('newsfeed/user/{user_hash_id}','NewsfeedController@getFromUserHashId');    
-    $app->get('newsfeed','NewsfeedController@index');
+    //$app->get('newsfeed/user/{user_hash_id}','NewsfeedController@getFromUserHashId');  //@TODO: Filtrar por aplicación
+    //$app->get('newsfeed','NewsfeedController@index'); //@TODO: Filtrar por aplicación
 
     // Calendar events
     $app->post('calendar_event','CalendarEventController@create');
-    $app->get('calendar_event/user/{user_hash_id}','CalendarEventController@getFromUserHashId');    
-    $app->get('calendar_event','CalendarEventController@index');
-    
+    //$app->get('calendar_event/user/{user_hash_id}','CalendarEventController@getFromUserHashId'); //@TODO: Filtrar por aplicación
+    //$app->get('calendar_event','CalendarEventController@index'); //@TODO: Filtrar por aplicación
+
     // Application
     $app->get('application','ApplicationController@index');
     $app->get('application/{id}','ApplicationController@getById');
@@ -55,13 +55,13 @@ $app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers','middle
     // Application privileges
     $app->get('privileges/granted/application/{id}','ApplicationController@getApplicationGrantedPrivileges');
     $app->get('privileges/granted','ApplicationController@getGrantedPrivileges');
-    
+
     // Content: Generic content CRUD
     $app->get('content','ContentController@index');
     $app->post('content/{content_type}','ContentController@create');
     $app->put('content/{id}','ContentController@update');
-    $app->delete('content/{id}','ContentController@delete');    
-    
+    $app->delete('content/{id}','ContentController@delete');
+
     //Geolocation
     $app->get('geolocation/user/{user_external_id}','GeolocationController@getFromUserHashId');
     $app->post('geolocation/users','GeolocationController@getFromUsers');
@@ -81,7 +81,7 @@ $app->group(['prefix' => 'mobile/api/v1','namespace' => '\App\Http\Controllers',
     // Notifications
     $app->get('notification','NotificationController@getFromAuthenticatedUser');
     $app->post('notification/read','NotificationController@read');
-    
+
     // Newsfeed
     $app->get('newsfeed','NewsfeedController@getFromAuthenticatedUser');
 
@@ -90,22 +90,22 @@ $app->group(['prefix' => 'mobile/api/v1','namespace' => '\App\Http\Controllers',
     $app->get('calendar_event/past','CalendarEventController@getPast');
     $app->get('calendar_event/future','CalendarEventController@getFuture');
     $app->get('calendar_event/between_dates/{start_date}/{end_date}','CalendarEventController@getBetweenDates');
-    
+
     // Subscriptions
     $app->post('context/subscription','SubscriptionController@subscribeUser');
     $app->delete('context/subscription/{application_name}/{context_name}','SubscriptionController@unsubscribeUser');
     $app->get('context/subscriptions','SubscriptionController@getFromAuthenticatedUser');
     $app->get('context/subscriptions/{application_name}','SubscriptionController@getByAppNameFromAuthenticatedUser');
-    
+
     // Contexts
-    $app->get('contexts/{application_name}','ContextController@getByApplication');    
-    
+    $app->get('contexts/{application_name}','ContextController@getByApplication');
+
     // User
     $app->get('user','UserController@getFromAuthenticatedUser');
     $app->post('user/push_token','UserController@registerPushToken');
     $app->delete('user/push_token/{type}/{token}','UserController@unregisterPushToken');
     $app->post('user/location','UserController@registerLocation');
-    
+
     // Contents
     $app->get('content','ContentController@getFromAuthenticatedUser');
     $app->get('content/data_url/{content_id}','ContentController@getFromUrl');
