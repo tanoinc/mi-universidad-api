@@ -19,7 +19,8 @@ tags:
   description: Operaciones sobre los eventos del calendario
 - name: contenido
   description: "Operaciones sobre los contenidos de los servicios: mapas de google y texto"
-  
+- name: localizacion
+  description: "Operaciones sobre geolocalización de los usuarios"  
 securityDefinitions:
   api_key:
     description: |
@@ -28,7 +29,7 @@ securityDefinitions:
         Por ejemplo, para una solicitud por POST, a /api/v1/newsfeed con el contenido: {"title":"Nuevo mensaje personal","content":"Contenido del mensaje","global":"0","send_notification":"1","users":["3"]}
         
         Se debe generar la firma con HMAC y sha256 en base al siguiente contenido:
-        {"full_url":"http:\/\/localhost\/api\/v1\/newsfeed","method":"post","input":{"title":"Nuevo mensaje personal","content":"Contenido del mensaje","global":"0","send_notification":"1","users":["3"]}}.
+        {"full_url":"http:\/\/localhost\/api\/v1\/newsfeed","method":"POST","input":{"title":"Nuevo mensaje personal","content":"Contenido del mensaje","global":"0","send_notification":"1","users":["3"]}}.
     type: apiKey
     name: Authorization
     in: header
@@ -103,6 +104,8 @@ paths:
           description: "Errores varios. Ver detalle en respuesta"
   /content/google_map:
     post:
+      security: 
+      - api_key: []    
       summary: "Crea un contenido de mapa de Google"
       description: "Crea un nuevo contenido de tipo mapa, que aparecerá en el menú principal, asociado al servicio (subaplicación añadida dentro de la aplicación 'Mi Universidad')"
       consumes:
@@ -115,15 +118,15 @@ paths:
       parameters:
       - in: body
         name: body
-        description: Atributos del evento a crear
+        description: Atributos del contenido de tipo mapa a crear
         required: true
         schema:
-          $ref: '#/definitions/content_post'
+          $ref: '#/definitions/content_google_map_post'
       responses:
         200:
           description: "Contenido creado"
           schema:
-            $ref: '#/definitions/newsfeed_post_response'
+            $ref: '#/definitions/content_post_response'
         401:
           description: "No autorizado"          
         403:
@@ -135,44 +138,146 @@ paths:
           schema:
             $ref: '#/definitions/error'
 
-    get:
-      tags:
-      - test
-      summary: searches inventory
-      operationId: searchInventory
-      description: |
-        By passing in the appropriate options, you can search for
-        available inventory in the system
+  /content/text:
+    post:
+      security: 
+      - api_key: []    
+      summary: "Crea un contenido de texto en formato markdown"
+      description: "Crea un nuevo contenido de tipo texto, que aparecerá en el menú principal, asociado al servicio (subaplicación añadida dentro de la aplicación 'Mi Universidad'). El texto deberá estar en formato markdown."
+      consumes:
+      - application/json
+      - application/x-www-form-urlencoded
       produces:
       - application/json
+      tags:
+      - contenido
       parameters:
-      - in: query
-        name: searchString
-        description: pass an optional search string for looking up inventory
-        required: false
-        type: string
-      - in: query
-        name: skip
-        description: number of records to skip for pagination
-        type: integer
-        format: int32
-        minimum: 0
-      - in: query
-        name: limit
-        description: maximum number of records to return
-        type: integer
-        format: int32
-        minimum: 0
-        maximum: 50
+      - in: body
+        name: body
+        description: Atributos del contenido tipo texto a crear
+        required: true
+        schema:
+          $ref: '#/definitions/content_text_post'
       responses:
         200:
-          description: search results matching criteria
+          description: "Contenido creado"
+          schema:
+            $ref: '#/definitions/content_post_response'
+        401:
+          description: "No autorizado"          
+        403:
+          description: "Acceso prohibido"
+        422:
+          description: "Error de validación"
+        500:
+          description: "Errores varios. Ver detalle en respuesta"
+          schema:
+            $ref: '#/definitions/error'
+  /geolocation/users:
+    post:
+      security: 
+      - api_key: []    
+      summary: "Obtiene las localizaciones de una lista de usuarios"
+      description: "Obtiene las localizaciones (coordenadas geográficas) de una lista de usuarios. Eta lista deberá estar compuesta por los IDs de usuario del servicio externo."
+      consumes:
+      - application/json
+      - application/x-www-form-urlencoded
+      produces:
+      - application/json
+      tags:
+      - localizacion
+      parameters:
+      - in: body
+        name: users
+        description: Arreglo con IDs de usuarios
+        required: true
+        schema:
+          type: array
+          items:
+            type: string
+            description: IDs de usuario (en servicio externo)
+          example: ["1","2"]
+      responses:
+        200:
+          description: "Lista de ubicaciones de los usuarios solicitados"
           schema:
             type: array
             items:
-              $ref: '#/definitions/InventoryItem'
-        400:
-          description: bad input parameter
+              $ref: '#/definitions/geolocation'
+        401:
+          description: "No autorizado"          
+        403:
+          description: "Acceso prohibido"
+        422:
+          description: "Error de validación"
+        500:
+          description: "Errores varios. Ver detalle en respuesta"
+          schema:
+            $ref: '#/definitions/error'            
+  /geolocation/user/{id_usuario}:
+    get:
+      security: 
+      - api_key: []
+      summary: "Obtiene las coordenadas geográficas de un usuario"
+      tags:
+      - localizacion
+      description: "Obtiene coordenadas geográficas del usuario con identificacion {id_usuario}. La identificacion corresponde a la del usuario en el servicio externo."
+      produces:
+      - application/json
+      parameters:
+      - in: path
+        name: id_usuario
+        description: "ID del usuario (en el servicio externo)"
+        required: true
+        type: string
+      responses:
+        200:
+          description: La última geolocalización del usuario
+          schema:
+            $ref: '#/definitions/geolocation'             
+        401:
+          description: "No autorizado"          
+        403:
+          description: "Acceso prohibido"
+        422:
+          description: "Error de validación"
+        500:
+          description: "Errores varios. Ver detalle en respuesta"
+          schema:
+            $ref: '#/definitions/error'        
+  /content/{id}:
+    delete:
+      security: 
+      - api_key: []    
+      tags:
+      - contenido
+      summary: Eliminar contenido
+      operationId: searchInventory
+      description: |
+        Elimina el contenido identificado por {id}
+      produces:
+      - application/json
+      parameters:
+      - in: path
+        name: id
+        description: "ID del contenido"
+        required: true
+        type: integer
+      responses:
+        200:
+          description: El contenido borrado
+          schema:
+            $ref: '#/definitions/content_post_response'
+        401:
+          description: "No autorizado"          
+        403:
+          description: "Acceso prohibido"
+        422:
+          description: "Error de validación"
+        500:
+          description: "Errores varios. Ver detalle en respuesta"
+          schema:
+            $ref: '#/definitions/error'
 
 definitions:
   error:
@@ -189,6 +294,8 @@ definitions:
         type: object
         example: null
         description: "Datos adicionales al error. Por ejemplo en una validación, los campos inválidos."
+
+        
   newsfeed:
     type: object
     properties:
@@ -394,7 +501,7 @@ definitions:
         description: "Opcional (si se utiliza, 'context_name' es requerido). Descripción del contexto, asociada al nombre único (context_name)."
         
 
-  content_post:
+  content_google_map_post:
     type: object
     required: 
     - name
@@ -404,7 +511,7 @@ definitions:
       name:
         type: string
         example: "Lugares de interés"
-        maxLength: 50
+        maxLength: 40
       description:
         type: string
         maxLength: 255
@@ -422,54 +529,105 @@ definitions:
         example: 200
         description: "Número que representa el órden en el que aparecerá en el menú (órden ascendente por este valor)"
       cache:
-        type: boolean
-        example: true
-        description: "Actualmente no utilizado. Indica si debe guardar en caché el contenido cargado de la url inidcada en 'url'"
+        type: integer
+        example: 1
+        enum: [0,1]
+        description: "Actualmente no utilizado. Opcional. Indica si debe guardar en caché el contenido cargado de la url inidcada en 'url'.  1 = cache activada, 0 = Sin cache. Por defecto: 0"
       cache_expiration:
         type: string
         example: "2017-07-01 00:00:00"
         description: "Actualmente no utilizado. Fecha de expiración de caché"
       send_user_info:
-        type: boolean
-        example: false
-        description: "Indica si debe enviar información del usuario al solicitar el contenido del 'url'. Si es verdadero, la solicitud se hará por POST y se enviará el ID de usuario del servicio (si existiera) y su ubicación geográfica."
-
-
-  InventoryItem:
+        type: integer      
+        example: 1
+        enum: [0,1]
+        description: "Indica si debe enviar información del usuario al solicitar el contenido del 'url'. Si es verdadero, la solicitud se hará por POST y se enviará el ID de usuario del servicio (si existiera) y su ubicación geográfica. 1 = Enviar info de usuario, 0 = no enviar info."
+  geolocation:
     type: object
-    required:
-    - id
-    - name
-    - manufacturer
-    - releaseDate
     properties:
+      altitude:
+        type: string
+      latitude:
+        type: string              
+      longitude:
+        type: string              
+      accuracy:
+        type: string              
+      heading:
+        type: string              
+      speed:
+        type: string  
+  content_post_response:
+    type: object
+    properties:
+      name:
+        type: string
+        example: "Texto1"
+      description: 
+        type: string
+        example: "texto de prueba 1"
+      icon_name: 
+        type: string
+        example: "leaf"
+      order:
+        type: integer      
+        example: "200"
+      contained_type:
+        type: string      
+        enum: ["App\\ContentText","App\\ContentGoogleMap"]
+        example: "App\\ContentText"
+      created_at: 
+        type: string
+        example: "2017-08-26 03:05:19"
       id:
-        type: string
-        format: uuid
-        example: d290f1ee-6c54-4b01-90e6-d701748f0851
-      name:
-        type: string
-        example: Widget Adapter
-      releaseDate:
-        type: string
-        format: int32
-        example: 2016-08-29T09:12:33.001Z
-      manufacturer:
-        $ref: '#/definitions/Manufacturer'
-  Manufacturer:
-    required:
+        type: integer
+        example: 7      
+  content_text_post:
+    type: object
+    required: 
     - name
+    - description
+    - text
     properties:
       name:
         type: string
-        example: ACME Corporation
-      homePage:
+        example: "Lugares de interés"
+        maxLength: 40
+      description:
         type: string
-        format: url
-        example:  https://www.acme-corp.com
-      phone:
+        maxLength: 255
+        example: "Lugares interesantes para visitar en el campus de la Universidad"
+      text:
         type: string
-        example: 408-867-5309
+        example: "Texto del contenido en formato markdown"        
+      url:
+        type: string
+        example: "http://localhost/obtener_marcadores"
+        description: "Actualmente no utilizado. URL desde donde se cargará la información del texto"
+      icon_name:
+        type: string
+        example: "map"
+        description: "Nombre del ícono que figurará en el menú de la aplicación relacionado con el contenido. Ver íconos de Ionic."
+      order:
+        type: integer
+        example: 200
+        description: "Número que representa el órden en el que aparecerá en el menú (órden ascendente por este valor)"
+      cache:
+        type: integer
+        example: 1
+        enum: [0,1]
+        description: "Actualmente no utilizado. Opcional. Indica si debe guardar en caché el contenido cargado de la url inidcada en 'url'.  1 = cache activada, 0 = Sin cache. Por defecto: 0"
+      cache_expiration:
+        type: string
+        example: "2017-07-01 00:00:00"
+        description: "Actualmente no utilizado. Fecha de expiración de caché"
+      send_user_info:
+        type: integer      
+        example: 1
+        enum: [0,1]
+        description: "Indica si debe enviar información del usuario al solicitar el contenido del 'url'. Si es verdadero, la solicitud se hará por POST y se enviará el ID de usuario del servicio (si existiera) y su ubicación geográfica. 1 = Enviar info de usuario, 0 = no enviar info."
+
+
 # Added by API Auto Mocking Plugin
 schemes:
  - https
