@@ -1,5 +1,7 @@
 # Mi Universidad: API
 
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
 * Interfaz en: https://app.swaggerhub.com/apis/tanoinc/mi-universidad/1.0.0
 
 ## TO DO
