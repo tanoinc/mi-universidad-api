@@ -24,7 +24,8 @@ $app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers'], funct
 
     // User
     $app->post('user','UserController@createUser');
-
+    $app->post('user/password','UserController@forgotPassword');
+    
     //facebook login
     //$app->post('auth/facebook','ExternalAuthController@facebook');
     $app->post('auth/facebook','ExternalAccessTokenController@issueToken');

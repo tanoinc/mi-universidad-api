@@ -31,7 +31,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'password', 'email'
     ];
     protected $hidden = [
-        'password', 'id', 'deleted_at'
+        'password', 'id', 'deleted_at', 'recover_password_value'
     ];
 
     public function applications()
@@ -74,6 +74,11 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         return $query->where('hash_id', '=', $hash_id);
     }
 
+    public function scopeFindByEmail($query, $email, $origin = User::ORIGIN_MOBILE)
+    {
+        return $query->where('email', '=', $email)->where('origin', $origin);
+    }    
+    
     public static function registerByData($user_data, $origin = User::ORIGIN_MOBILE)
     {
         $user = static::firstOrNew(['username' => $user_data['username'], 'origin' => $origin ]);
@@ -119,6 +124,16 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
             $user->surname = $user_data['surname'];
         }
     }
+    
+    public function recoverPassword() {
+        if ($this->origin == User::ORIGIN_MOBILE) {
+            $this->recover_password_value = static::generateRecoverPasswordValue();
+        } else {
+            throw new \Exception($this->origin.' not supported for password recovery.');
+        }
+        
+        return $this->recover_password_value;
+    }
 
     public static function encodePassword($password, $origin= User::ORIGIN_MOBILE)
     {
@@ -128,6 +143,11 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         return password_hash($password, PASSWORD_DEFAULT);        
     }
 
+    public static function generateRecoverPasswordValue()
+    {
+        return strtoupper(substr(sha1(random_bytes(8)), 0, 5));
+    }    
+    
     public static function encodeHashId($username)
     {
         return sha1(random_bytes(8) . $username);

@@ -81,5 +81,23 @@ class UserController extends Controller
         }
         return response()->json(false);
     }
+    
+    public function forgotPassword(Request $request)
+    {
+        $this->validate($request, ['email'=> 'required|email|max:255' ]);
+        $user = User::findByEmail($request->get('email'))->first();
+        if ($user) {
+            $this->mailRecoveryPassword($user);
+            $user->save();
+        }
+    }
+
+    protected function mailRecoveryPassword($user) {
+        return $this->mail($user, sprintf(env('MAIL_RECOVER_PASSWORD_MSG','Your \'Mi Universidad\' password recovery code is: %s'), $user->recoverPassword()), env('MAIL_RECOVER_PASSWORD_SUBJECT','Mi Universidad: Password recovery'));
+    }
+    
+    protected function mail($user, $msg, $subject) {
+        return app('mailer')->raw($msg, function($msg) use ($user, $subject) { $msg->to([$user->email]); $msg->subject($subject); });        
+    }
 
 }
