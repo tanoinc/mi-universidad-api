@@ -15,6 +15,7 @@ class RecoverPassword extends Migration
     {
         Schema::table('user', function (Blueprint $table) {
             $table->string('recover_password_value', 50)->nullable();
+            $table->integer('recover_password_count')->nullable();
         });
     }
 
@@ -27,6 +28,7 @@ class RecoverPassword extends Migration
     {
         Schema::table('user', function (Blueprint $table) {
             $table->dropColumn('recover_password_value');
+            $table->dropColumn('recover_password_count');
         });
     }
 }

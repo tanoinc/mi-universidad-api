@@ -105,11 +105,15 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
         return $user;
     }
+    
+    public function setPassword($password) {
+        $this->password = static::encodePassword($password, $this->origin);
+    }
 
     public static function setData(User $user, $user_data)
     {
         if (isset($user_data['password'])) {
-            $user->password = static::encodePassword($user_data['password'], $user->origin);
+            $user->setPassword($user_data['password']);
         }
         if (isset($user_data['email'])) {
             $user->email = $user_data['email'];
@@ -128,11 +132,26 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     public function recoverPassword() {
         if ($this->origin == User::ORIGIN_MOBILE) {
             $this->recover_password_value = static::generateRecoverPasswordValue();
+            $this->recover_password_count = 10;
         } else {
             throw new \Exception($this->origin.' not supported for password recovery.');
         }
         
         return $this->recover_password_value;
+    }
+    
+    public function isRecoveryCodeValid($code) {
+        if ($this->recover_password_count === null or $this->recover_password_value === null or $this->recover_password_count <= 0) {
+            return false;
+        }
+        if (!($this->recover_password_value == strtoupper($code))) {
+            $this->recover_password_count--;
+            return false;
+        }
+        $this->recover_password_value = null;
+        $this->recover_password_count = null;
+        
+        return true;
     }
 
     public static function encodePassword($password, $origin= User::ORIGIN_MOBILE)
@@ -143,10 +162,10 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         return password_hash($password, PASSWORD_DEFAULT);        
     }
 
-    public static function generateRecoverPasswordValue()
+    public static function generateRecoverPasswordValue($long = 6)
     {
-        return strtoupper(substr(sha1(random_bytes(8)), 0, 5));
-    }    
+        return strtoupper(substr(bin2hex(random_bytes($long)), 0, $long));
+    }
     
     public static function encodeHashId($username)
     {

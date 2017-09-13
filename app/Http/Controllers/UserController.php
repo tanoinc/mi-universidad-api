@@ -12,6 +12,9 @@ use Illuminate\Http\Request;
 use App\User;
 use Illuminate\Support\Facades\Auth;
 use App\UserPushToken;
+use App\Exceptions\AcceptedRequestForgotPasswordException;
+use App\Exceptions\RejectedCodeForgotPasswordException;
+use App\Exceptions\AcceptedCodeForgotPasswordException;
 
 /**
  * The User controller class
@@ -84,16 +87,41 @@ class UserController extends Controller
     
     public function forgotPassword(Request $request)
     {
-        $this->validate($request, ['email'=> 'required|email|max:255' ]);
+        $this->validate($request, [ 'email' => 'required|email|max:255' ]);
         $user = User::findByEmail($request->get('email'))->first();
         if ($user) {
             $this->mailRecoveryPassword($user);
             $user->save();
         }
+        throw new AcceptedRequestForgotPasswordException();
     }
-
+    
+    public function forgotPasswordReset(Request $request)
+    {
+        $code_length = env('MAIL_RECOVER_PASSWORD_CODE_LENGTH', 6);
+        $this->validate($request, [
+            'email'=> 'required|email|max:255',
+            'code' => 'required|alpha_num|max:'.$code_length.'|min:'.$code_length,
+            'password' => 'required|min:8|max:255',
+        ]);
+        $user = User::findByEmail($request->get('email'))->first();
+        if ($user) {
+            if ($user->isRecoveryCodeValid($request->get('code'))) {
+                $user->setPassword($request->get('password'));
+                $user->save();
+                throw new AcceptedCodeForgotPasswordException();
+            } else {
+                $user->save();
+            }
+        }
+        throw new RejectedCodeForgotPasswordException();
+    }
+    
     protected function mailRecoveryPassword($user) {
-        return $this->mail($user, sprintf(env('MAIL_RECOVER_PASSWORD_MSG','Your \'Mi Universidad\' password recovery code is: %s'), $user->recoverPassword()), env('MAIL_RECOVER_PASSWORD_SUBJECT','Mi Universidad: Password recovery'));
+        $code_length = env('MAIL_RECOVER_PASSWORD_CODE_LENGTH', 6);
+        $subject = env('MAIL_RECOVER_PASSWORD_SUBJECT','Mi Universidad: Password recovery');
+        $message = env('MAIL_RECOVER_PASSWORD_MSG','Your \'Mi Universidad\' password recovery code is: %s');
+        return $this->mail($user, sprintf($message, $user->recoverPassword($code_length)), $subject);
     }
     
     protected function mail($user, $msg, $subject) {
