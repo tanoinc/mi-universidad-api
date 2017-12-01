@@ -27,7 +27,7 @@ class CalendarEventExtraFields extends Migration
     public function down()
     {
         Schema::table('calendar_event', function (Blueprint $table) {
-            $table->dropColumn('location');
+            $table->dropColumn('event_location');
             $table->dropColumn('event_description');
         });
     }
