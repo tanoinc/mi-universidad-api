@@ -85,6 +85,11 @@ class UserController extends Controller
         return response()->json(false);
     }
     
+    public function passwordChange(Request $request)
+    {
+        
+    }
+    
     public function forgotPassword(Request $request)
     {
         $this->validate($request, [ 'email' => 'required|email|max:255' ]);
