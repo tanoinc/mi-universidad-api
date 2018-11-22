@@ -91,10 +91,21 @@ class ApiKeyMiddleware
         return ($hash == $this->auth_signature);
     }
 
+    protected function getUrl($request)
+    {
+        $force_ssl = env('FORCE_SSL',false);
+        $url = $request->fullUrl();
+        if ($force_ssl) {
+            $url  = preg_replace('/^http\:/', 'https:', $url );
+        }
+        
+        return $url;
+    }
+    
     protected function getHmacContent($request)
     {
         $content = [
-            'full_url' => $request->fullUrl(),
+            'full_url' => $this->getUrl($request),
             'method' => $request->method(),
             'input' => $request->all(),
         ];
