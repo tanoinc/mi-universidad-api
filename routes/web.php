@@ -11,106 +11,106 @@
 |
 */
 
-$app->get('/', function () use ($app) {
+$router->get('/', function () use ($router) {
     return sprintf("Hola %s!", env('MOBILE_APP_NAME'));
 });
 
 // Public
-$app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers'], function($app)
+$router->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers'], function($router)
 {
-    $app->get('config/init','ConfigurationController@initialConfig');
+    $router->get('config/init','ConfigurationController@initialConfig');
 
-    $app->get('config/service_status','ConfigurationController@serviceStatus');
+    $router->get('config/service_status','ConfigurationController@serviceStatus');
 
     // User
-    $app->post('user','UserController@createUser');
-    $app->post('user/password','UserController@forgotPassword');
-    $app->put('user/password','UserController@forgotPasswordReset');
+    $router->post('user','UserController@createUser');
+    $router->post('user/password','UserController@forgotPassword');
+    $router->put('user/password','UserController@forgotPasswordReset');
     
     //facebook login
-    //$app->post('auth/facebook','ExternalAuthController@facebook');
-    $app->post('auth/facebook','ExternalAccessTokenController@issueToken');
+    //$router->post('auth/facebook','ExternalAuthController@facebook');
+    $router->post('auth/facebook','ExternalAccessTokenController@issueToken');
 
 });
 
 // Server-side apps (api-key + signature)
-$app->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers','middleware'=>['auth_api_key','check_privileges']], function($app)
+$router->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers','middleware'=>['auth_api_key','check_privileges']], function($router)
 {
     // Newsfeed
-    $app->post('newsfeed','NewsfeedController@create');
-    //$app->get('newsfeed/user/{user_hash_id}','NewsfeedController@getFromUserHashId');  //@TODO: Filtrar por aplicación
-    //$app->get('newsfeed','NewsfeedController@index'); //@TODO: Filtrar por aplicación
+    $router->post('newsfeed','NewsfeedController@create');
+    //$router->get('newsfeed/user/{user_hash_id}','NewsfeedController@getFromUserHashId');  //@TODO: Filtrar por aplicación
+    //$router->get('newsfeed','NewsfeedController@index'); //@TODO: Filtrar por aplicación
 
     // Calendar events
-    $app->post('calendar_event','CalendarEventController@create');
-    //$app->get('calendar_event/user/{user_hash_id}','CalendarEventController@getFromUserHashId'); //@TODO: Filtrar por aplicación
-    //$app->get('calendar_event','CalendarEventController@index'); //@TODO: Filtrar por aplicación
+    $router->post('calendar_event','CalendarEventController@create');
+    //$router->get('calendar_event/user/{user_hash_id}','CalendarEventController@getFromUserHashId'); //@TODO: Filtrar por aplicación
+    //$router->get('calendar_event','CalendarEventController@index'); //@TODO: Filtrar por aplicación
 
     // Application
-    $app->get('application','ApplicationController@index');
-    $app->get('application/{id}','ApplicationController@getById');
-    $app->post('application','ApplicationController@createApplication');
-    $app->put('application/subscription/{id}/{token}','ApplicationController@updateSubscription');
-    //$app->put('application/{id}','ApplicationController@updateApplication');
-    //$app->delete('application/{id}','ApplicationController@deleteApplication');
+    $router->get('application','ApplicationController@index');
+    $router->get('application/{id}','ApplicationController@getById');
+    $router->post('application','ApplicationController@createApplication');
+    $router->put('application/subscription/{id}/{token}','ApplicationController@updateSubscription');
+    //$router->put('application/{id}','ApplicationController@updateApplication');
+    //$router->delete('application/{id}','ApplicationController@deleteApplication');
 
     // Application privileges
-    $app->get('privileges/granted/application/{id}','ApplicationController@getApplicationGrantedPrivileges');
-    $app->get('privileges/granted','ApplicationController@getGrantedPrivileges');
+    $router->get('privileges/granted/application/{id}','ApplicationController@getApplicationGrantedPrivileges');
+    $router->get('privileges/granted','ApplicationController@getGrantedPrivileges');
 
     // Content: Generic content CRUD
-    $app->get('content','ContentController@index');
-    $app->post('content/{content_type}','ContentController@create');
-    $app->put('content/{id}','ContentController@update');
-    $app->delete('content/{id}','ContentController@delete');
+    $router->get('content','ContentController@index');
+    $router->post('content/{content_type}','ContentController@create');
+    $router->put('content/{id}','ContentController@update');
+    $router->delete('content/{id}','ContentController@delete');
 
     //Geolocation
-    $app->get('geolocation/user/{user_external_id}','GeolocationController@getFromUserHashId');
-    $app->post('geolocation/users','GeolocationController@getFromUsers');
+    $router->get('geolocation/user/{user_external_id}','GeolocationController@getFromUserHashId');
+    $router->post('geolocation/users','GeolocationController@getFromUsers');
 });
 
 // Mobile app (OAuth2)
-$app->group(['prefix' => 'mobile/api/v1','namespace' => '\App\Http\Controllers','middleware'=>['auth']], function($app)
+$router->group(['prefix' => 'mobile/api/v1','namespace' => '\App\Http\Controllers','middleware'=>['auth']], function($router)
 {
     // Applications
-    $app->get('application','ApplicationController@getFromAuthenticatedUser');
-    $app->get('application/available','ApplicationController@getAvailable');
-    $app->post('application/subscription', 'ApplicationController@subscribe');
-    $app->delete('application/subscription/{application_name}', 'ApplicationController@unsubscribe');
-    $app->get('application/content','ContentController@getFromAuthenticatedUser');
-    $app->get('application/content/{application_name}','ContentController@getFromApplication');
+    $router->get('application','ApplicationController@getFromAuthenticatedUser');
+    $router->get('application/available','ApplicationController@getAvailable');
+    $router->post('application/subscription', 'ApplicationController@subscribe');
+    $router->delete('application/subscription/{application_name}', 'ApplicationController@unsubscribe');
+    $router->get('application/content','ContentController@getFromAuthenticatedUser');
+    $router->get('application/content/{application_name}','ContentController@getFromApplication');
 
     // Notifications
-    $app->get('notification','NotificationController@getFromAuthenticatedUser');
-    $app->post('notification/read','NotificationController@read');
+    $router->get('notification','NotificationController@getFromAuthenticatedUser');
+    $router->post('notification/read','NotificationController@read');
 
     // Newsfeed
-    $app->get('newsfeed','NewsfeedController@getFromAuthenticatedUser');
+    $router->get('newsfeed','NewsfeedController@getFromAuthenticatedUser');
 
     // Calendar events
-    $app->get('calendar_event','CalendarEventController@getFromAuthenticatedUser');
-    $app->get('calendar_event/past','CalendarEventController@getPast');
-    $app->get('calendar_event/future','CalendarEventController@getFuture');
-    $app->get('calendar_event/between_dates/{start_date}/{end_date}','CalendarEventController@getBetweenDates');
+    $router->get('calendar_event','CalendarEventController@getFromAuthenticatedUser');
+    $router->get('calendar_event/past','CalendarEventController@getPast');
+    $router->get('calendar_event/future','CalendarEventController@getFuture');
+    $router->get('calendar_event/between_dates/{start_date}/{end_date}','CalendarEventController@getBetweenDates');
 
     // Subscriptions
-    $app->post('context/subscription','SubscriptionController@subscribeUser');
-    $app->delete('context/subscription/{application_name}/{context_name}','SubscriptionController@unsubscribeUser');
-    $app->get('context/subscriptions','SubscriptionController@getFromAuthenticatedUser');
-    $app->get('context/subscriptions/{application_name}','SubscriptionController@getByAppNameFromAuthenticatedUser');
+    $router->post('context/subscription','SubscriptionController@subscribeUser');
+    $router->delete('context/subscription/{application_name}/{context_name}','SubscriptionController@unsubscribeUser');
+    $router->get('context/subscriptions','SubscriptionController@getFromAuthenticatedUser');
+    $router->get('context/subscriptions/{application_name}','SubscriptionController@getByAppNameFromAuthenticatedUser');
 
     // Contexts
-    $app->get('contexts/{application_name}','ContextController@getByApplication');
+    $router->get('contexts/{application_name}','ContextController@getByApplication');
 
     // User
-    $app->get('user','UserController@getFromAuthenticatedUser');
-    $app->post('user/push_token','UserController@registerPushToken');
-    $app->delete('user/push_token/{type}/{token}','UserController@unregisterPushToken');
-    $app->post('user/location','UserController@registerLocation');
-    $app->put('user/password','UserController@passwordChange');
+    $router->get('user','UserController@getFromAuthenticatedUser');
+    $router->post('user/push_token','UserController@registerPushToken');
+    $router->delete('user/push_token/{type}/{token}','UserController@unregisterPushToken');
+    $router->post('user/location','UserController@registerLocation');
+    $router->put('user/password','UserController@passwordChange');
 
     // Contents
-    $app->get('content','ContentController@getFromAuthenticatedUser');
-    $app->get('content/data_url/{content_id}','ContentController@getFromUrl');
-    $app->post('content/data_url/{content_id}','ContentController@getFromUrl');
+    $router->get('content','ContentController@getFromAuthenticatedUser');
+    $router->get('content/data_url/{content_id}','ContentController@getFromUrl');
+    $router->post('content/data_url/{content_id}','ContentController@getFromUrl');
 });
