@@ -75,6 +75,8 @@ $app->middleware([
 //     'auth' => App\Http\Middleware\Authenticate::class,
 // ]);
 
+$app->configure('auth');
+
 /*
 |--------------------------------------------------------------------------
 | Register Service Providers
@@ -110,5 +112,7 @@ $app->register(\App\Providers\MailServiceProvider::class);
 $app->router->group(['namespace' => 'App\Http\Controllers'], function ($router) {
     require __DIR__.'/../routes/web.php';
 });
+
+\Dusterio\LumenPassport\LumenPassport::routes($app->router->app);
 
 return $app;
