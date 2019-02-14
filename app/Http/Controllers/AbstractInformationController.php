@@ -14,7 +14,7 @@ use App\User;
 use App\UserApplication;
 use App\Context;
 use App\Application;
-use App\Library\IonicApiV2;
+use App\Library\Generic\PushNotificationsInterface;
 use App\Notification;
 
 /**
@@ -49,14 +49,14 @@ abstract class AbstractInformationController extends Controller
         return response()->json($information);
     }
 
-    public function create(Request $request, IonicApiV2 $ionic)
+    public function create(Request $request, PushNotificationsInterface $pushService)
     {
         $information = $this->newFromRequest($request);
         $information->save();
         $this->setUsersFromRequest($information, $request);
         $notifications = null;
         if ($information->send_notification) {
-            $notifications = $this->sendNotifications($ionic, $information);
+            $notifications = $this->sendNotifications($pushService, $information);
             $information->notifications()->saveMany($notifications);
         }
         $push_uuid = null;
@@ -70,11 +70,11 @@ abstract class AbstractInformationController extends Controller
         ]);
     }
     
-    protected function sendNotifications(IonicApiV2 $ionic, AbstractInformation $information) {
+    protected function sendNotifications(PushNotificationsInterface $pushService, AbstractInformation $information) {
         $notifications = [];
         $recipients = $information->getUsersForNotification();
         if (Notification::NOTIFY_ALL_USERS == $recipients) {
-            $recipients = IonicApiV2::RECIPIENT_ALL;
+            $recipients = PushNotificationsInterface::RECIPIENT_ALL;
             $notifications[] = static::newNotification(null);
         } else {
             foreach ($recipients as $user) {
@@ -82,7 +82,7 @@ abstract class AbstractInformationController extends Controller
             }
         }
         try {
-            $push_data_uuid = $ionic->sendPushNotification($recipients, $information->getNotificationTitle(), $information->getNotificationContent(), ['type'=> get_class($information), 'object' => $information] );
+            $push_data_uuid = $pushService->sendPushNotification($recipients, $information->getNotificationTitle(), $information->getNotificationContent(), ['type'=> get_class($information), 'object' => $information] );
             foreach ($notifications as $notification ) {
                 $notification->push_data_uuid = $push_data_uuid;
             }

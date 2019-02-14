@@ -25,4 +25,8 @@ class UserPushToken extends Model
         return $this->belongsTo('App\User');
     }
     
+    public function scopeFindByToken($query, $token)
+    {
+        return $query->where('token', '=', $token);
+    }
 }
