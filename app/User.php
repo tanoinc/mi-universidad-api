@@ -79,8 +79,15 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         return $query->where('email', '=', $email)->where('origin', $origin);
     }    
     
+    protected static function normalize(&$data)
+    {
+        $data['username'] = strtolower(trim($data['username']));
+        $data['email'] = strtolower(trim($data['email']));
+    }
+    
     public static function registerByData($user_data, $origin = User::ORIGIN_MOBILE)
     {
+        static::normalize($user_data);
         $user = static::firstOrNew(['username' => $user_data['username'], 'origin' => $origin ]);
         $new = (!$user->hash_id);
         if ($new) {

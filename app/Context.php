@@ -89,8 +89,8 @@ class Context extends Model
         $value = strtolower($value);
         return $query->where('application_id', $app->id)
                         ->where(function($q) use ($value) {
-                            $q->where('name', 'LIKE', "%$value%")
-                            ->orWhere('description', 'LIKE', "%$value%");
+                            $q->whereRaw('LOWER(name) LIKE ?', "%$value%")
+                            ->orWhereRaw('LOWER(description) LIKE ?', "%$value%");
                         });
     }
 
