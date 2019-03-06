@@ -1,0 +1,25 @@
+version: '2'
+volumes:
+  consejo-uploads:
+  consejo-db:
+services:
+  app: 
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    environment:
+      DB_NAME: miuniversidad
+      DB_HOST: db
+      DB_USER: db_user
+      DB_PORT: 3306
+      DB_PASSWORD: db_user_pass
+      APACHE_DOCUMENT_ROOT: /app/web
+    ports:
+      - "8081:80"
+  db:
+    image: mysql:5.6
+    environment: 
+      MYSQL_DATABASE: miuniversidad
+      MYSQL_ROOT_PASSWORD: db_user_pass
+    volumes:
+      - consejo-db:/var/lib/mysql
