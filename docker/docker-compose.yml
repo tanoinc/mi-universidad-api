@@ -1,25 +1,43 @@
 version: '2'
-volumes:
-  consejo-uploads:
-  consejo-db:
 services:
   app: 
     build:
       context: ..
       dockerfile: docker/Dockerfile
     environment:
-      DB_NAME: miuniversidad
-      DB_HOST: db
-      DB_USER: db_user
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_KEY: 
+      APP_TIMEZONE: UTC
+      DB_CONNECTION: mysql
+      DB_HOST: 127.0.0.1
       DB_PORT: 3306
-      DB_PASSWORD: db_user_pass
-      APACHE_DOCUMENT_ROOT: /app/web
+      DB_DATABASE: homestead
+      DB_USERNAME: homestead
+      DB_PASSWORD: secret
+      CACHE_DRIVER: memcached
+      QUEUE_DRIVER: sync
+      OAUTH_CLIENT_ID: 2
+      OAUTH_CLIENT_SECRET: 
+      MOBILE_APP_NAME: mi-universidad-mobile
+      FCM_SERVER_KEY: 
+      FCM_SENDER_ID: 
+      ITEMS_PER_PAGE_DEFAULT: 20
+      ITEMS_PER_PAGE_CALENDAR: 100
+      PUSH_NOTIFICATIONS_ENABLED: "true"
+      FACEBOOK_APP_ID: 
+      FACEBOOK_SECRET: 
+      MAIL_DRIVER: smtp
+      MAIL_HOST: localhost
+      MAIL_PORT: 
+      MAIL_USERNAME: 
+      MAIL_PASSWORD: 
+      MAIL_ENCRYPTION: 
+      MAIL_FROM_ADDRESS: 
+      MAIL_FROM_NAME: 
+      MAIL_RECOVER_PASSWORD_MSG: "Your Mi Universidad password recovery code is: %s"
+      MAIL_RECOVER_PASSWORD_SUBJECT: "Mi Universidad: Password recovery"
+      MAIL_RECOVER_PASSWORD_CODE_LENGTH: 6
+      APACHE_DOCUMENT_ROOT: /app/public
     ports:
       - "8081:80"
-  db:
-    image: mysql:5.6
-    environment: 
-      MYSQL_DATABASE: miuniversidad
-      MYSQL_ROOT_PASSWORD: db_user_pass
-    volumes:
-      - consejo-db:/var/lib/mysql

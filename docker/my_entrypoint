@@ -5,16 +5,12 @@ export APACHE_RUN_USER=${APACHE_RUN_USER:-www-data}
 export APACHE_RUN_GROUP=${APACHE_RUN_GROUP:-www-data}
 export MEMORY_LIMIT=${MEMORY_LIMIT:-'512M'}
 export DB_SECRET="secret"
-#envsubst '${DB_NAME} ${DB_HOST} ${DB_USER} ${DB_PASSWORD} ${DB_PORT} ${UPLOAD_DIR} ${UPLOAD_DIR_PRIVATE} ${DB_SECRET} ${x509_CERT} ${ENTITY_ID} ${URL_ACS} ${URL_LOGOUT} ${MAILER_HOST} ${MAILER_USER} ${MAILER_PASSWORD} ${MAILER_SENDER_ADDRESS} ${MAILER_PORT}' < /app/app/config/parameters.yml.docker > /app/app/config/parameters.yml
-#envsubst '${x509_CERT} ${ENTITY_ID} ${URL_ACS} ${URL_LOGOUT}' < /app/app/config/config.yml.docker > /app/app/config/config.yml
-#mkdir /app/var/cache -p
-#mkdir /app/var/logs -p
-#mkdir /app/var/sessions -p
+#envsubst '${DB_NAME} ${DB_HOST} ${DB_USER} ${DB_PASSWORD} ${DB_PORT} ${UPLOAD_DIR} ${UPLOAD_DIR_PRIVATE} ${DB_SECRET} ${x509_CERT} ${ENTITY_ID} ${URL_ACS} ${URL_LOGOUT} ${MAILER_HOST} ${MAILER_USER} ${MAILER_PASSWORD} ${MAILER_SENDER_ADDRESS} ${MAILER_PORT}' < /app/.env.example > /app/.env
 #mkdir $UPLOAD_DIR_PRIVATE -p
+chown $APACHE_RUN_USER -R /app/storage/app /app/storage/logs /app/storage/framework
+php artisan migrate:refresh
 #php artisan db:seed
 #php artisan passport:install
-chown www-data -R /app/storage/app /app/storage/logs /app/var/framework
-composer install
-php artisan migrate:refresh
+#composer install
 composer dump-autoload
 exec "$@"
