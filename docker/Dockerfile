@@ -15,6 +15,7 @@ RUN echo "es_AR.UTF-8 UTF-8" >> /etc/locale.gen && locale-gen
 RUN printf "date.timezone=America/Argentina/Buenos_Aires\nupload_max_filesize = 20M\npost_max_size = 20M\n" >> /usr/local/etc/php/php.ini
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+RUN a2enmod rewrite
 EXPOSE 80
 ADD docker/my_entrypoint /usr/local/bin/my_entrypoint
 ENTRYPOINT ["my_entrypoint"]
