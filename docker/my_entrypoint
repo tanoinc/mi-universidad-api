@@ -7,6 +7,7 @@ export MEMORY_LIMIT=${MEMORY_LIMIT:-'512M'}
 export DB_SECRET="secret"
 echo ${OAUTH_PRIVATE_KEY} > /app/storage/oauth-private.key
 echo ${OAUTH_PUBLIC_KEY} > /app/storage/oauth-public.key
+touch /app/storage/logs/lumen.log
 chown $APACHE_RUN_USER -R /app/storage
 php artisan migrate:refresh
 composer dump-autoload
