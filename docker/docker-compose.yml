@@ -39,5 +39,7 @@ services:
       MAIL_RECOVER_PASSWORD_SUBJECT: "Mi Universidad: Password recovery"
       MAIL_RECOVER_PASSWORD_CODE_LENGTH: 6
       APACHE_DOCUMENT_ROOT: /app/public
+      OAUTH_PRIVATE_KEY: ''
+      OAUTH_PUBLIC_KEY: ''
     ports:
       - "8081:80"
