@@ -13,4 +13,6 @@ php artisan migrate:refresh
 #php artisan passport:install
 #composer install
 composer dump-autoload
+echo ${OAUTH_PRIVATE_KEY} > /app/storage/oauth-private.key
+echo ${OAUTH_PUBLIC_KEY} > /app/storage/oauth-public.key
 exec "$@"
