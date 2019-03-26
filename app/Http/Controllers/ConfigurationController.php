@@ -6,7 +6,12 @@ class ConfigurationController extends Controller
 {
     public function initialConfig()
     {
-        $config = [ 'client_id' => env('OAUTH_CLIENT_ID'), 'client_secret' => env('OAUTH_CLIENT_SECRET')];
+        $config = [ 
+            'client_id' => env('OAUTH_CLIENT_ID'), 
+            'client_secret' => env('OAUTH_CLIENT_SECRET'),
+            'contact_email' => env('CONTACT_EMAIL', 'test@test'),
+            'contact_subject' => env('CONTACT_SUBJECT', '[miuniversidad] contact')
+        ];
         
         return response()->json($config);
     }

@@ -22,7 +22,7 @@ class CorsMiddleware
         $response->headers->set('Access-Control-Allow-Methods', 'HEAD, GET, POST, PUT, PATCH, DELETE');
         $response->headers->set('Access-Control-Allow-Headers', $request->header('Access-Control-Request-Headers'));
         $response->headers->set('Access-Control-Allow-Credentials', 'true');
-        $response->headers->set('Access-Control-Allow-Origin', 'http://localhost:8100');
+        $response->headers->set('Access-Control-Allow-Origin', '*');
         return $response;
     }
 
