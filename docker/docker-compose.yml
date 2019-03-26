@@ -41,5 +41,8 @@ services:
       APACHE_DOCUMENT_ROOT: /app/public
       OAUTH_PRIVATE_KEY: ''
       OAUTH_PUBLIC_KEY: ''
+      CONTACT_EMAIL: mesadeayuda@cespi.unlp.edu.ar
+      CONTACT_SUBJECT: [MiUNLP]
+
     ports:
       - "8081:80"
