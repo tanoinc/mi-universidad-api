@@ -43,6 +43,7 @@ $router->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers','mid
 
     // Calendar events
     $router->post('calendar_event','CalendarEventController@create');
+    $router->delete('calendar_event/{id}','CalendarEventController@delete');
     //$router->get('calendar_event/user/{user_hash_id}','CalendarEventController@getFromUserHashId'); //@TODO: Filtrar por aplicación
     //$router->get('calendar_event','CalendarEventController@index'); //@TODO: Filtrar por aplicación
 

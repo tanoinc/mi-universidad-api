@@ -70,6 +70,24 @@ abstract class AbstractInformationController extends Controller
         ]);
     }
     
+    public function delete($id)
+    {
+        $class = $this->getModelClass();
+        $information = $class::findOrFail($id);
+        if (!$this->canDelete($information)) {
+            throw new ForbiddenAccessException();
+        }
+        $information->delete();
+
+        return response()->json($information);
+    }
+    
+    protected function canDelete($information)
+    {
+        return ($information->application_id == $this->getApplication()->id);
+    }
+
+
     protected function sendNotifications(PushNotificationsInterface $pushService, AbstractInformation $information) {
         $notifications = [];
         $recipients = $information->getUsersForNotification();
