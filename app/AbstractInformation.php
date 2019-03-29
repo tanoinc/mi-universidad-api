@@ -33,6 +33,17 @@ abstract class AbstractInformation extends Model
         $this->table = static::TABLE_NAME;
         parent::__construct($attributes);
     }
+    
+    public static function boot()
+    {
+        parent::boot();
+        static::deleting([static::class, 'preDelete']);
+    }
+    
+    public static function preDelete(AbstractInformation $value)
+    {
+        $value->notifications()->delete();
+    }
 
     public function application()
     {
