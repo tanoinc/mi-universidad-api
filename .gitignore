@@ -6,3 +6,7 @@ Homestead.yaml
 /nbproject/private/
 /nbproject
 lumen_ide_helper.php
+storage/oauth-private.key
+storage/oauth-public.key
+*~
+

@@ -29,7 +29,7 @@ class CreateApplicationCommand extends Command
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         $name = $this->input->getOption('name');
         $description = $this->input->getOption('description');
