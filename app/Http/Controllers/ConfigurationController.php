@@ -10,7 +10,8 @@ class ConfigurationController extends Controller
             'client_id' => env('OAUTH_CLIENT_ID'), 
             'client_secret' => env('OAUTH_CLIENT_SECRET'),
             'contact_email' => env('CONTACT_EMAIL', 'test@test'),
-            'contact_subject' => env('CONTACT_SUBJECT', '[miuniversidad] contact')
+            'contact_subject' => env('CONTACT_SUBJECT', '[miuniversidad] contact'),
+            'api_version' => $this->getApiVersion(),
         ];
         
         return response()->json($config);
@@ -22,6 +23,7 @@ class ConfigurationController extends Controller
             'http' => true,
             'db' => $this->getStatusDb(),
             'app' => $this->getStatusApp(),
+            'api_version' => $this->getApiVersion(),
         ]);
     }
     
@@ -43,5 +45,10 @@ class ConfigurationController extends Controller
         } catch (Exception $e) {
             return false;
         }
+    }
+    
+    protected function getApiVersion()
+    {
+        return trim(file_get_contents(__DIR__.'/../../../REVISION'));
     }
 }

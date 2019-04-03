@@ -8,5 +8,6 @@ Homestead.yaml
 lumen_ide_helper.php
 storage/oauth-private.key
 storage/oauth-public.key
+/REVISION
 *~
 
