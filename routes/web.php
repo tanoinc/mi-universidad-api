@@ -21,6 +21,7 @@ $router->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers'], fu
     $router->get('config/init','ConfigurationController@initialConfig');
 
     $router->get('config/service_status','ConfigurationController@serviceStatus');
+    $router->get('config/version/{version}/compatibility','ConfigurationController@versionCompatibility');
 
     // User
     $router->post('user','UserController@createUser');

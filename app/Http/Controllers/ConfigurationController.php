@@ -17,6 +17,13 @@ class ConfigurationController extends Controller
         return response()->json($config);
     }
     
+    public function versionCompatibility($version)
+    {
+        $compatible = \App\ClientCompatibility::findByVersion($version)->first();
+
+        return response()->json(!empty($compatible));
+    }
+    
     public function serviceStatus()
     {
         return response()->json([
