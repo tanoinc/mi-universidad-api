@@ -10,6 +10,6 @@ echo ${OAUTH_PRIVATE_KEY} > /app/storage/oauth-private.key
 echo ${OAUTH_PUBLIC_KEY} > /app/storage/oauth-public.key
 touch /app/storage/logs/lumen.log
 chown $APACHE_RUN_USER -R /app/storage
-php artisan migrate:refresh
+php artisan migrate
 composer dump-autoload
 exec "$@"
