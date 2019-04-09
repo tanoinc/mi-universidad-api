@@ -19,6 +19,12 @@ class Notification extends Model
     const TYPE_CALENDAR_EVENT = 'App\CalendarEvent';
     const TYPES = array(Notification::TYPE_CALENDAR_EVENT, Notification::TYPE_NEWSFEED);
     
+    protected $casts = [
+        'created_at' => 'datetime:c',
+        'updated_at' => 'datetime:c',
+        'read_date' => 'datetime:c',
+    ];    
+    
     protected $table = 'notification';
     protected $fillable = [
         'read_date', 'notifiable_type'

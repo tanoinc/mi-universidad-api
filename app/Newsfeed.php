@@ -17,6 +17,12 @@ class Newsfeed extends AbstractInformation
 {
 
     const TABLE_NAME = 'newsfeed';
+
+    protected $casts = [
+        'created_at' => 'datetime:c',
+        'updated_at' => 'datetime:c',
+        'deleted_at' => 'datetime:c',
+    ];
     
     protected $fillable = [
         'title',
@@ -25,7 +31,7 @@ class Newsfeed extends AbstractInformation
         'global',
         'context_id',
     ];
-    
+
     protected function getPrivilegeSendNotification()
     {
         return Privilege::NEWSFEED_SEND_NOTIFICATION;

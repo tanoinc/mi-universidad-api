@@ -42,11 +42,18 @@ abstract class AbstractInformationController extends Controller
         return $model_class::fromUser($user);
     }
 
+    protected function hydrateInformation($paginatedCollection)
+    {
+        $model_class = $this->getModelClass();
+        $this->hydratePage($paginatedCollection, $model_class);
+    }
+    
     protected function getFromUser(User $user, $order_by = 'created_at', $order = 'desc')
     {
-        $information = $this->getQueryFromUser($user)->orderBy($order_by,$order)->simplePaginate(env('ITEMS_PER_PAGE_DEFAULT',20));
+        $result = $this->getQueryFromUser($user)->orderBy($order_by,$order)->simplePaginate(env('ITEMS_PER_PAGE_DEFAULT',20));
+        $this->hydrateInformation($result);
 
-        return response()->json($information);
+        return response()->json( $result );
     }
 
     public function create(Request $request, PushNotificationsInterface $pushService)

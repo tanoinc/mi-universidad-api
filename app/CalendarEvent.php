@@ -26,6 +26,12 @@ class CalendarEvent extends AbstractInformation
         'global',
         'context_id',
     ];
+    protected $casts = [
+        'event_date' => 'datetime:c',
+        'created_at' => 'datetime:c',
+        'updated_at' => 'datetime:c',
+        'deleted_at' => 'datetime:c',
+    ];    
 
     protected function getPrivilegeSendNotification()
     {

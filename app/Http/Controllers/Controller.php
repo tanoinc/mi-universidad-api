@@ -76,4 +76,9 @@ class Controller extends BaseController
         }
         return new \Illuminate\Support\Collection([]);
     }
+    
+    protected function hydratePage($paginatedCollection, $class)
+    {
+        $paginatedCollection->setCollection($class::hydrate($paginatedCollection->getCollection()->toArray()));
+    }
 }
