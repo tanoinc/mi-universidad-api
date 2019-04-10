@@ -11,6 +11,7 @@ class ConfigurationController extends Controller
             'client_secret' => env('OAUTH_CLIENT_SECRET'),
             'contact_email' => env('CONTACT_EMAIL', 'test@test'),
             'contact_subject' => env('CONTACT_SUBJECT', '[miuniversidad] contact'),
+            'recover_password_retry_time' => env('MAIL_RECOVER_PASSWORD_CODE_RETRY_TIME', '10'),
             'api_version' => $this->getApiVersion(),
         ];
         

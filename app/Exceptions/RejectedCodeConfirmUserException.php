@@ -13,18 +13,18 @@ namespace App\Exceptions;
  *
  * @author tanoinc
  */
-class AcceptedCodeForgotPasswordException extends GenericErrorException
+class RejectedCodeConfirmUserException extends GenericErrorException
 {
     public function getStatusCode()
     {
-        return 200;
+        return 401;
     }    
     public function getErrorCode() 
     {
-        return 1;
+        return 4;
     }
     public function getCustomMessage()
     {
-        return trim("Password reset.");
+        return trim("Invalid confirmation code.");
     }
 }

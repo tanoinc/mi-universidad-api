@@ -93,6 +93,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         if ($new) {
             $user->hash_id = static::encodeHashId($user_data['username']);
             $user->origin = $origin;
+            $user->unconfirm();
         }
         static::setData($user, $user_data);
         $user->save();
@@ -117,6 +118,14 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         $this->password = static::encodePassword($password, $this->origin);
     }
 
+    public function confirm() {
+        $this->confirmed = true;
+    }
+    
+    public function unconfirm() {
+        $this->confirmed = false;
+    }
+    
     public static function setData(User $user, $user_data)
     {
         if (isset($user_data['password'])) {
@@ -136,10 +145,27 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         }
     }
     
+    public function canRecoverPassword() {
+        if (!$this->origin == User::ORIGIN_MOBILE) {
+            return false;
+        }
+
+        if (!$this->last_password_recovery) {
+            return true;
+        }
+        
+        $exiprationTime = new \DateTime($this->last_password_recovery);
+        $exiprationTime->modify('+'.env('MAIL_RECOVER_PASSWORD_CODE_RETRY_TIME', '10').' minutes');
+        $now = new \DateTime();
+        
+        return ($now >= $exiprationTime);
+    }
+    
     public function recoverPassword() {
         if ($this->origin == User::ORIGIN_MOBILE) {
             $this->recover_password_value = static::generateRecoverPasswordValue();
             $this->recover_password_count = 10;
+            $this->last_password_recovery = new \DateTime();
         } else {
             throw new \Exception($this->origin.' not supported for password recovery.');
         }
@@ -157,6 +183,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         }
         $this->recover_password_value = null;
         $this->recover_password_count = null;
+        $this->last_password_recovery = null;
         
         return true;
     }
@@ -197,7 +224,11 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     public function findForPassport($username) 
     {
         return $this->where('origin', static::ORIGIN_MOBILE)->where(function($q) use ($username){
-            $q->where('email', $username)->orWhere('username', $username);
+            $q
+                ->where('confirmed', true)
+                ->where(function($q2) use ($username){
+                    $q2->where('email', $username)->orWhere('username', $username);
+                });            
         })->first();
     }
 

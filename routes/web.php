@@ -16,7 +16,7 @@ $router->get('/', function () use ($router) {
 });
 
 // Public
-$router->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers'], function($router)
+$router->group(['prefix' => 'v1','namespace' => '\App\Http\Controllers'], function($router)
 {
     $router->get('config/init','ConfigurationController@initialConfig');
 
@@ -27,6 +27,7 @@ $router->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers'], fu
     $router->post('user','UserController@createUser');
     $router->post('user/password','UserController@forgotPassword');
     $router->put('user/password','UserController@forgotPasswordReset');
+    $router->put('user/confirmation','UserController@confirmUser');
     
     //facebook login
     //$router->post('auth/facebook','ExternalAuthController@facebook');
@@ -35,7 +36,7 @@ $router->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers'], fu
 });
 
 // Server-side apps (api-key + signature)
-$router->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers','middleware'=>['auth_api_key','check_privileges']], function($router)
+$router->group(['prefix' => 'v1','namespace' => '\App\Http\Controllers','middleware'=>['auth_api_key','check_privileges']], function($router)
 {
     // Newsfeed
     $router->post('newsfeed','NewsfeedController@create');
@@ -72,7 +73,7 @@ $router->group(['prefix' => 'api/v1','namespace' => '\App\Http\Controllers','mid
 });
 
 // Mobile app (OAuth2)
-$router->group(['prefix' => 'mobile/api/v1','namespace' => '\App\Http\Controllers','middleware'=>['auth']], function($router)
+$router->group(['prefix' => 'mobile/v1','namespace' => '\App\Http\Controllers','middleware'=>['auth']], function($router)
 {
     // Applications
     $router->get('application','ApplicationController@getFromAuthenticatedUser');

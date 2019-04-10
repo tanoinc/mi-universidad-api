@@ -15,6 +15,8 @@ use App\UserPushToken;
 use App\Exceptions\AcceptedRequestForgotPasswordException;
 use App\Exceptions\RejectedCodeForgotPasswordException;
 use App\Exceptions\AcceptedCodeForgotPasswordException;
+use App\Exceptions\AcceptedCodeConfirmUserException;
+use App\Exceptions\RejectedCodeConfirmUserException;
 
 /**
  * The User controller class
@@ -40,6 +42,8 @@ class UserController extends Controller
     {
         $this->validate($request, $this->getCreationConstraints());
         $user = User::registerByData($request->all());
+        $this->mailUserConfirmation($user);
+        $user->save();
 
         return response()->json($user);
     }
@@ -94,7 +98,7 @@ class UserController extends Controller
     {
         $this->validate($request, [ 'email' => 'required|email|max:255' ]);
         $user = User::findByEmail($request->get('email'))->first();
-        if ($user) {
+        if ($user and $user->canRecoverPassword()) {
             $this->mailRecoveryPassword($user);
             $user->save();
         }
@@ -103,10 +107,9 @@ class UserController extends Controller
     
     public function forgotPasswordReset(Request $request)
     {
-        $code_length = env('MAIL_RECOVER_PASSWORD_CODE_LENGTH', 6);
         $this->validate($request, [
             'email'=> 'required|email|max:255',
-            'code' => 'required|alpha_num|max:'.$code_length.'|min:'.$code_length,
+            'code' => $this->getCodeValidation(),
             'password' => 'required|min:8|max:255',
         ]);
         $user = User::findByEmail($request->get('email'))->first();
@@ -122,12 +125,55 @@ class UserController extends Controller
         throw new RejectedCodeForgotPasswordException();
     }
     
+    public function confirmUser(Request $request)
+    {
+        $this->validateCodeRequest($request, function ($user) {
+            $user->confirm();
+        });
+    }    
+    
+    protected function validateCodeRequest(Request $request, $fnValid, $validation = [])
+    {
+        $this->validate($request, array_merge($validation, [
+            'email'=> 'required|email|max:255',
+            'code' => $this->getCodeValidation(),
+        ]));
+        $user = User::findByEmail($request->get('email'))->first();
+        if ($user) {
+            if ($user->isRecoveryCodeValid($request->get('code'))) {
+                $fnValid($user);
+                $user->save();
+                throw new AcceptedCodeConfirmUserException();
+            } else {
+                $user->save();
+            }
+        }
+        throw new RejectedCodeConfirmUserException();
+    }
+    
     protected function mailRecoveryPassword($user) {
-        $code_length = env('MAIL_RECOVER_PASSWORD_CODE_LENGTH', 6);
         $subject = env('MAIL_RECOVER_PASSWORD_SUBJECT','Mi Universidad: Password recovery');
         $message = env('MAIL_RECOVER_PASSWORD_MSG','Your \'Mi Universidad\' password recovery code is: %s');
+        return $this->mailCode($user, $subject, $message);
+    }
+    
+    protected function mailUserConfirmation($user) {
+        $subject = env('MAIL_USER_CONFIRMATION_SUBJECT','Mi Universidad: Email Confirmation');
+        $message = env('MAIL_USER_CONFIRMATION_MSG','Your \'Mi Universidad\' confirmation code is: %s');
+        return $this->mailCode($user, $subject, $message);
+    }
+    
+    protected function mailCode($user, $subject, $message) {
+        $code_length = env('MAIL_RECOVER_PASSWORD_CODE_LENGTH', 6);
         return $this->mail($user, sprintf($message, $user->recoverPassword($code_length)), $subject);
     }
+    
+    protected function getCodeValidation()
+    {
+        $code_length = env('MAIL_RECOVER_PASSWORD_CODE_LENGTH', 6);
+        return 'required|alpha_num|max:'.$code_length.'|min:'.$code_length;
+    }
+    
     
     protected function mail($user, $msg, $subject) {
         return app('mailer')->raw($msg, function($msg) use ($user, $subject) { $msg->to([$user->email]); $msg->subject($subject); });        
