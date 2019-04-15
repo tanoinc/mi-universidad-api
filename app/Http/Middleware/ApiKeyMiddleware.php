@@ -102,7 +102,7 @@ class ApiKeyMiddleware
         $force_url = env('FORCE_URL',false);
         $force_url_replace = env('FORCE_URL_REPLACE',false);
         if ($force_url and $force_url_replace) {
-            $url  = preg_replace('/^'.$force_url_replace.'/', $force_url, $url );
+            $url  = preg_replace('/'.$force_url_replace.'/', $force_url, $url );
         }
         
         return $url;
