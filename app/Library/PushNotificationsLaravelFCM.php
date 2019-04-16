@@ -7,7 +7,6 @@ use LaravelFCM\Message\OptionsBuilder;
 use LaravelFCM\Message\PayloadDataBuilder;
 use LaravelFCM\Message\PayloadNotificationBuilder;
 use LaravelFCM\Facades\FCM;
-use LaravelFCM\Facades\FCMGroup;
 use App\UserPushToken;
 
 /**
@@ -25,7 +24,7 @@ class PushNotificationsLaravelFCM implements PushNotificationsInterface
         $tokens = [];
         foreach ($users as $user) {
             foreach ($user->pushTokens()->get() as $token) {
-                if ($token->token != '') {
+                if ($token->token != '' and !in_array($token->token, $tokens)) {
                     $tokens[] = $token->token;
                 }
             }

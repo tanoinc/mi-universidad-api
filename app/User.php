@@ -227,7 +227,8 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
             $q
                 ->where('confirmed', true)
                 ->where(function($q2) use ($username){
-                    $q2->where('email', $username)->orWhere('username', $username);
+                    $username = strtolower($username);
+                    $q2->whereRaw('LOWER(email) LIKE ?', $username)->orWhereRaw('LOWER(username) LIKE ?', $username);
                 });            
         })->first();
     }
