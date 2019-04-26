@@ -45,7 +45,7 @@ class CalendarEvent extends AbstractInformation
 
     public function getNotificationTitle()
     {
-        return $this->event_date;
+        return $this->event_date->format(env('DATE_FORMAT_READABLE','d/m/Y H:i'));
     }
     
     public static function fromUserBetweenDates(User $user, \DateTime $start, \DateTime $end)
