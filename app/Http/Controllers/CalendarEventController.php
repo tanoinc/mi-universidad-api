@@ -79,7 +79,8 @@ class CalendarEventController extends AbstractInformationController
     {
         $information = CalendarEvent::fromUserBetweenDates(Auth::user(), new \DateTime($start_date), new \DateTime($end_date) )
             ->simplePaginate(env('ITEMS_PER_PAGE_CALENDAR', 100));
-
+        $this->hydrateInformation($information);
+        
         return response()->json( $information );
     }
 
