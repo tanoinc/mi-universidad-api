@@ -105,6 +105,11 @@ class Application extends Model
         return $query->where('name', 'LIKE', "%$value%");
     }
 
+    public function scopeExceptApp($query, $app_name)
+    {
+        return $query->where('name', 'NOT LIKE', $app_name);
+    }
+
     public function scopeNotSubscribedBy($query, User $user)
     {
         return $query->whereNotIn('id', function ($query_in) use ($user) {

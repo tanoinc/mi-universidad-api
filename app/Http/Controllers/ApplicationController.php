@@ -96,7 +96,11 @@ class ApplicationController extends Controller
     protected function getFromUser(User $user)
     {
         $search_value = $this->getSearchValue();
-        $applications = $user->subscribed_applications()->search($search_value)->simplePaginate(env('ITEMS_PER_PAGE_DEFAULT', 20));
+        
+        $applications = $user->subscribed_applications()
+                ->search($search_value)
+                ->exceptApp(env('MOBILE_APP_NAME')) // Cant unsubscribe from main application
+                ->simplePaginate(env('ITEMS_PER_PAGE_DEFAULT', 20));
 
         return response()->json($applications);
     }
@@ -130,6 +134,11 @@ class ApplicationController extends Controller
 
     public function unsubscribe($application_name)
     {
+        // Cant unsubscribe from main application
+        if (env('MOBILE_APP_NAME') == $application_name) {
+            throw new \App\Exceptions\RejectedUnsubscribeApplicationException();
+        }
+        
         $app = Application::findByName($application_name)->firstOrFail();
         $application_subscription = \App\UserApplication::findByApplicationAndUser($app, Auth::user())->firstOrFail();
         $application_subscription->delete();
