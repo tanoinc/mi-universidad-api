@@ -18,6 +18,7 @@ class Privilege extends Model
 {
     const NEWSFEED_SEND_NOTIFICATION = 'newsfeed:send_notification';
     const CALENDAR_EVENT_SEND_NOTIFICATION = 'calendar_event:send_notification';
+    const ATTENDANCE_SEND_NOTIFICATION = 'attendance:send_notification';
     const LEVEL_USER = 'user';
     const LEVEL_APPLICATION = 'application';
     

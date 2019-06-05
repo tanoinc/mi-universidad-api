@@ -14,19 +14,25 @@ use Illuminate\Support\Facades\DB;
  */
 abstract class AppMigration extends Migration
 {
-    protected function addClientVersions($versions)
+    protected function addClientVersions($versions, $truncate = true)
     {
-        if (!empty($versions)) {
-            $versionsToInsert = [];
-            foreach ($versions as $version) {
-                $versionsToInsert[] = [
-                    'client_version' => $version,
-                    'created_at' => new \DateTime(),
-                    'updated_at' => new \DateTime(),
-                ];
-            }
+        if ($truncate) {
             DB::table('client_compatibility')->truncate();
-            DB::table('client_compatibility')->insert($versionsToInsert);
         }
+        
+        if (empty($versions)) {
+            return ;
+        }
+        
+        $versionsToInsert = [];
+        foreach ($versions as $version) {
+            $versionsToInsert[] = [
+                'client_version' => $version,
+                'created_at' => new \DateTime(),
+                'updated_at' => new \DateTime(),
+            ];
+        }
+        
+        DB::table('client_compatibility')->insert($versionsToInsert);
     }
 }

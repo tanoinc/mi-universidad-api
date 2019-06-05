@@ -95,6 +95,10 @@ $router->group(['prefix' => 'mobile/v1','namespace' => '\App\Http\Controllers','
     $router->get('calendar_event/past','CalendarEventController@getPast');
     $router->get('calendar_event/future','CalendarEventController@getFuture');
     $router->get('calendar_event/between_dates/{start_date}/{end_date}','CalendarEventController@getBetweenDates');
+    
+    //Attendance
+    $router->get('attendance','AttendanceController@getFromAuthenticatedUser');
+    $router->get('attendance/future','AttendanceController@getFuture');
 
     // Subscriptions
     $router->post('context/subscription','SubscriptionController@subscribeUser');
