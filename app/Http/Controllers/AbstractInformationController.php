@@ -36,10 +36,10 @@ abstract class AbstractInformationController extends Controller
         return response()->json($information);
     }
     
-    protected function getQueryFromUser(User $user) 
+    protected function getQueryFromUser(User $user, $fn_filter = null) 
     {
         $model_class = $this->getModelClass();
-        return $model_class::fromUser($user);
+        return $model_class::fromUser($user, $fn_filter);
     }
 
     protected function hydrateInformation($paginatedCollection)

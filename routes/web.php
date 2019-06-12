@@ -49,6 +49,10 @@ $router->group(['prefix' => 'v1','namespace' => '\App\Http\Controllers','middlew
     //$router->get('calendar_event/user/{user_hash_id}','CalendarEventController@getFromUserHashId'); //@TODO: Filtrar por aplicación
     //$router->get('calendar_event','CalendarEventController@index'); //@TODO: Filtrar por aplicación
 
+    // Attendance
+    $router->post('attendance','AttendanceController@create');
+    $router->delete('attendance/{id}','AttendanceController@delete');    
+    
     // Application
     $router->get('application','ApplicationController@index');
     $router->get('application/{id}','ApplicationController@getById');
@@ -63,6 +67,7 @@ $router->group(['prefix' => 'v1','namespace' => '\App\Http\Controllers','middlew
 
     // Content: Generic content CRUD
     $router->get('content','ContentController@index');
+    $router->get('content/{id}','ContentController@get');
     $router->post('content/{content_type}','ContentController@create');
     $router->put('content/{id}','ContentController@update');
     $router->delete('content/{id}','ContentController@delete');
@@ -99,6 +104,7 @@ $router->group(['prefix' => 'mobile/v1','namespace' => '\App\Http\Controllers','
     //Attendance
     $router->get('attendance','AttendanceController@getFromAuthenticatedUser');
     $router->get('attendance/future','AttendanceController@getFuture');
+    $router->get('attendance/now','AttendanceController@getNow');
 
     // Subscriptions
     $router->post('context/subscription','SubscriptionController@subscribeUser');

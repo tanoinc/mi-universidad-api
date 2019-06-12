@@ -55,6 +55,8 @@ class Attendance extends \App\Database\Migrations\AppMigration
             $table->foreign('attendance_id')->references('id')->on('attendance');
         });
         
+        App\Privilege::createCrud('attendance', 'AttendanceController');
+        
         $this->addClientVersions(['1.0.%','1.1.%','1.2.%']);
         
     }
@@ -67,6 +69,7 @@ class Attendance extends \App\Database\Migrations\AppMigration
     public function down()
     {
         $this->addClientVersions(['1.0.%','1.1.%']);
+        App\Privilege::removeFromModel('attendance');
         Schema::dropIfExists('attendance_user');
         Schema::dropIfExists('attendance_control');
         Schema::dropIfExists('attendance');

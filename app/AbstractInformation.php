@@ -154,14 +154,20 @@ abstract class AbstractInformation extends Model
         return $query3;
     }
     
-    public static function fromUser($user)
+    public static function fromUser(User $user, $fn_filter = null)
     {
-        $query = static::queryFromUser($user);
-        $query2 = static::queryFromApplication($user)->union($query);
-        $query3 = static::queryFromContext($user);
-        $query2->union($query3);
+        if (!$fn_filter) {
+            $fn_filter = function($query) {
+                return $query;
+            };
+        }
+        $query = $fn_filter(static::queryFromUser($user));
+        $query2 = $fn_filter(static::queryFromApplication($user));
+        $query3 = $fn_filter(static::queryFromContext($user));
 
+        $query2->union($query)->union($query3);
+        
         return $query2;
     }
-
+    
 }

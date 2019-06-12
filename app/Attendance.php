@@ -51,13 +51,14 @@ class Attendance extends AbstractInformation
         return $this->start_time->format(env('DATE_FORMAT_READABLE','d/m/Y H:i'));
     }
     
-    public static function fromUserBetweenDates(User $user, \DateTime $start, \DateTime $end)
+    public static function fromUserInMoment(User $user, \DateTime $moment)
     {
-        $query = static::queryFromUser($user)->whereBetween('event_date', [$start, $end]);
-        $query2 = static::queryFromApplication($user)->union($query)->whereBetween('event_date', [$start, $end]);
-        $query3 = static::queryFromContext($user)->whereBetween('event_date', [$start, $end]);
+        $query = static::queryFromUser($user)->whereBetween($moment, ['start_time', 'end_time']);
+        $query2 = static::queryFromApplication($user)->union($query)->whereBetween($moment, ['start_time', 'end_time']);
+        $query3 = static::queryFromContext($user)->whereBetween($moment, ['start_time', 'end_time']);
         $query2->union($query3);
 
         return $query2;
     }
+    
 }

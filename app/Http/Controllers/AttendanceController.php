@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\CalendarEvent;
+use App\Attendance;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -13,16 +13,28 @@ use Illuminate\Support\Facades\Auth;
 class AttendanceController extends AbstractInformationController
 {
 
+    use Traits\InformationDateableControllerTrait;
+
+    public function getFuture()
+    {
+        return $this->getFutureByDate('start_time');
+    }
+    
+    public function getNow()
+    {
+        return $this->getNowByDate('start_time', 'end_time');
+    }
+
     protected function getModelClass()
     {
-        return CalendarEvent::class;
+        return Attendance::class;
     }
 
     protected function getModelName()
     {
-        return 'calendar_event';
+        return 'attendance';
     }
-    
+
     protected function getValidationRules()
     {
         $rules = parent::getValidationRules();
@@ -31,7 +43,7 @@ class AttendanceController extends AbstractInformationController
         $rules['location'] = 'max:255';
         $rules['start_time'] = 'required|date';
         $rules['end_time'] = 'required|date';
-        
+
         return $rules;
     }
 
@@ -50,5 +62,5 @@ class AttendanceController extends AbstractInformationController
     {
         return parent::getFromUser($user, $order_by, $order);
     }
-    
+
 }
