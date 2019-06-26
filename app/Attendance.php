@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 namespace App;
 
 /**
@@ -28,14 +22,30 @@ class Attendance extends AbstractInformation
         'global',
         'context_id',
     ];
+    
     protected $casts = [
         'start_time' => 'datetime:c',
         'end_time' => 'datetime:c',
         'created_at' => 'datetime:c',
         'updated_at' => 'datetime:c',
         'deleted_at' => 'datetime:c',
-    ];    
+    ];
 
+    public function users()
+    {
+        return $this->belongsToMany('App\User', 'attendance_user');
+    }
+
+    public function attendanceUser()
+    {
+        return $this->belongsTo('App\AttendanceUser');
+    }
+
+    public function controls()
+    {
+        return $this->hasMany(AttendanceControl::class);
+    }
+    
     protected function getPrivilegeSendNotification()
     {
         return Privilege::ATTENDANCE_SEND_NOTIFICATION;
@@ -50,15 +60,22 @@ class Attendance extends AbstractInformation
     {
         return $this->start_time->format(env('DATE_FORMAT_READABLE','d/m/Y H:i'));
     }
-    
-    public static function fromUserInMoment(User $user, \DateTime $moment)
-    {
-        $query = static::queryFromUser($user)->whereBetween($moment, ['start_time', 'end_time']);
-        $query2 = static::queryFromApplication($user)->union($query)->whereBetween($moment, ['start_time', 'end_time']);
-        $query3 = static::queryFromContext($user)->whereBetween($moment, ['start_time', 'end_time']);
-        $query2->union($query3);
 
-        return $query2;
+    public function isActive()
+    {
+        return true;
     }
-    
+
+    public function getAttendanceUser(User $user) {
+        return AttendanceUser::firstOrNew([ 'attendance_id' => $this->id, 'user_id' => $user->id ]);
+    }
+
+    public function setAttendanceUserPresent(User $user)
+    {
+        $attendance_user = $this->getAttendanceUser($user);
+        $attendance_user->setStatusPresent();
+
+        return $attendance_user;
+    }
+
 }

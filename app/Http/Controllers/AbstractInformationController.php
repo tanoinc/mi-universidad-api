@@ -11,11 +11,11 @@ namespace App\Http\Controllers;
 use App\AbstractInformation;
 use Illuminate\Http\Request;
 use App\User;
-use App\UserApplication;
 use App\Context;
 use App\Application;
 use App\Library\Generic\PushNotificationsInterface;
 use App\Notification;
+use Illuminate\Pagination\Paginator;
 
 /**
  * The Ageneral Information controller abstract class
@@ -42,10 +42,15 @@ abstract class AbstractInformationController extends Controller
         return $model_class::fromUser($user, $fn_filter);
     }
 
-    protected function hydrateInformation($paginatedCollection)
+    protected function hydrateInformation(&$collection)
     {
         $model_class = $this->getModelClass();
-        $this->hydratePage($paginatedCollection, $model_class);
+        
+        if ($collection instanceof Paginator) {
+            $this->hydratePage($collection, $model_class);
+        } else {
+            $this->hydrateCollection($collection, $model_class);
+        }
     }
     
     protected function getFromUser(User $user, $order_by = 'created_at', $order = 'desc')

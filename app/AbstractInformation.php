@@ -70,6 +70,11 @@ abstract class AbstractInformation extends Model
         return false; // @TODO: verificar que la aplicacions sea la movil y que la notificacion sea global
     }
     
+    public function sameAs(AbstractInformation $information)
+    {
+        return ($this->id == $information->id);
+    }
+    
     protected abstract function getPrivilegeSendNotification();
     public abstract function getNotificationTitle();
     public abstract function getNotificationContent();

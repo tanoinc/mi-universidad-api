@@ -105,6 +105,7 @@ $router->group(['prefix' => 'mobile/v1','namespace' => '\App\Http\Controllers','
     $router->get('attendance','AttendanceController@getFromAuthenticatedUser');
     $router->get('attendance/future','AttendanceController@getFuture');
     $router->get('attendance/now','AttendanceController@getNow');
+    $router->put('attendance/status/{attendance_id}','AttendanceController@changeStatus');
 
     // Subscriptions
     $router->post('context/subscription','SubscriptionController@subscribeUser');

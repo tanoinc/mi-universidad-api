@@ -60,7 +60,7 @@ class CalendarEventController extends AbstractInformationController
     
     public function getFuture()
     {
-        return $this->getFutureByDate('event_date');
+        return $this->getResponseByFutureDate('event_date');
     }
     
     public function getPast()

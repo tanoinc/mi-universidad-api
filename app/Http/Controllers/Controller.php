@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Exceptions\CustomValidationException;
 use Illuminate\Validation\ValidationException;
 use App\UserApplication;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Collection;
 
 class Controller extends BaseController
 {
@@ -77,8 +79,13 @@ class Controller extends BaseController
         return new \Illuminate\Support\Collection([]);
     }
     
-    protected function hydratePage($paginatedCollection, $class)
+    protected function hydratePage(Paginator $paginated_collection, $class)
     {
-        $paginatedCollection->setCollection($class::hydrate($paginatedCollection->getCollection()->toArray()));
+        $paginated_collection->setCollection($class::hydrate($paginated_collection->getCollection()->toArray()));
+    }
+    
+    protected function hydrateCollection(Collection &$collection, $class)
+    {
+        $collection = $class::hydrate($collection->toArray());
     }
 }

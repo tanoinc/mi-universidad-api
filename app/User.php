@@ -59,6 +59,11 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         return $this->belongsToMany('App\Context', 'context_user_subscription');
     }
 
+    public function attendances()
+    {
+        return $this->belongsToMany('App\Attendance', 'attendance_user');
+    }    
+    
     public function pushTokens()
     {
         return $this->hasMany('App\UserPushToken');
