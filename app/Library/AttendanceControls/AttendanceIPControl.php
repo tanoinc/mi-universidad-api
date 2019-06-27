@@ -7,7 +7,7 @@ namespace App\Library\AttendanceControls;
  *
  * @author lucianoc
  */
-class IPControl extends AbstractAttendanceControl
+class AttendanceIPControl extends AbstractAttendanceControl
 {
 
     public function isValid()

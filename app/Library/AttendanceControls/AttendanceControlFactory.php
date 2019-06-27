@@ -4,7 +4,6 @@ namespace App\Library\AttendanceControls;
 
 use App\AttendanceControl;
 use App\Attendance;
-use App\Library\AttendanceControls\IPControl;
 use Illuminate\Http\Request;
 
 /**
@@ -15,21 +14,6 @@ use Illuminate\Http\Request;
 class AttendanceControlFactory
 {
 
-    CONST TYPE_IP = 'ip';
-    
-    public static function types() {
-        return [
-            static::TYPE_IP,
-        ];
-    }
-
-
-    public static function typeClases() {
-        return [
-            static::TYPE_IP => IPControl::class,
-        ];
-    }
-    
     protected static function decodeParameters($string_parameters)
     {
         if (empty($string_parameters)) {
@@ -43,7 +27,7 @@ class AttendanceControlFactory
     {
         $control_class = $attendance_control->type;
         
-        if (!in_array($control_class, static::typeClases())) {
+        if (!in_array($control_class, AttendanceControl::typeClasses())) {
             throw new ClassNotFoundException("Control class '{$control_class}' not found for attendance control");
         }
         

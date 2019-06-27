@@ -24,18 +24,7 @@ abstract class AbstractAttendanceControl
         $this->parameters = $parameters;
         $this->request = $request;
     }
-    
-    public static function allValid($controls)
-    {
-        foreach ($controls as $control) {
-            if (!$control->isValid()) {
-                return false;
-            }
-        }
-        
-        return true;
-    }
-    
+   
     public abstract static function areValidParameters($parameters);
     public abstract function isValid();
     

@@ -33,8 +33,8 @@ trait InformationDateableControllerTrait
             };
         }        
         
-        $fn_filter = function ($query) use ($start_date_field, $now) {
-            return $query
+        $fn_filter = function ($query) use ($start_date_field, $now, $fn_custom_filter) {
+            return $fn_custom_filter($query)
                 ->where($start_date_field, '>=', $now);
         };
 
@@ -62,8 +62,8 @@ trait InformationDateableControllerTrait
 
     protected function getDateableResponse($dateable_information)
     {
-        $paginated_dates = $dateable_information->
-                simplePaginate(env('ITEMS_PER_PAGE_DEFAULT', 20));
+        $paginated_dates = $dateable_information
+                ->simplePaginate(env('ITEMS_PER_PAGE_DEFAULT', 20));
 
         $this->hydrateInformation($paginated_dates);
 
@@ -80,7 +80,7 @@ trait InformationDateableControllerTrait
     protected function getResponseByNowDate($start_date_field, $end_date_field, $fn_custom_filter = null)
     {
         $dateable_information = $this->getByNowDate($start_date_field, $end_date_field, $fn_custom_filter);
-        
+
         return $this->getDateableResponse($dateable_information);
     }
 

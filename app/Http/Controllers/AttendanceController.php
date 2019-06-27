@@ -8,8 +8,8 @@ use App\User;
 use Illuminate\Http\Request;
 use App\Exceptions\AttendanceInactiveException;
 use Illuminate\Support\Facades\Auth;
-use App\Library\AttendanceControls\AttendanceControlFactory;
-use App\Library\AttendanceControls\AbstractAttendanceControl;
+use App\Library\AttendanceControls\AttendanceControlValidator;
+use App\AttendanceControl;
 
 /**
  * The AttendanceController controller class
@@ -21,25 +21,18 @@ class AttendanceController extends AbstractInformationController
 
     use Traits\InformationDateableControllerTrait;
     
-    protected function getWithAttendanceFunction()
-    {
-        return function ($query) {
-            return $query->leftJoin('attendance_control', 'attendance_control.attendance_id', '=', 'attendance.id');
-        };
-    }
-
     public function getFuture()
     {
-        $fn_custom_filter = $this->getWithAttendanceFunction();
-        
-        return $this->getResponseByFutureDate('start_time', $fn_custom_filter);
+        return $this->getResponseByFutureDate(
+                'start_time', 
+                AttendanceControl::fnWithAttendanceControl());
     }
     
     public function getNow()
     {
-        $fn_custom_filter = $this->getWithAttendanceFunction();
-        
-        return $this->getResponseByNowDate('start_time', 'end_time', $fn_custom_filter);
+        return $this->getResponseByNowDate('start_time', 'end_time', 
+                AttendanceControl::fnWithAttendanceControl()
+        );
     }
 
     public function changeStatus($attendance_id)
@@ -62,8 +55,8 @@ class AttendanceController extends AbstractInformationController
         }
 
         // Check defined controls from attendance
-        $controls = AttendanceControlFactory::makeFromAttendance($attendance, app('request') );
-        if (!AbstractAttendanceControl::allValid($controls)) 
+        $controls = new AttendanceControlValidator($attendance, app('request'));
+        if (!$controls->allValid()) 
         {
             throw new \App\Exceptions\AttendanceControlException();
         }

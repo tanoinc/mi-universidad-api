@@ -77,5 +77,39 @@ class Attendance extends AbstractInformation
 
         return $attendance_user;
     }
+    
+    public static function prepareForHydrate($array) {
+        //@TODO: Refactoring
+        if (empty($array)) {
+            return [];
+        }
+        
+        if (!isset($array[0]->control_type)) {
+            return $array;
+        }
+        
+        $hydrated_array = [];
+        $id = null;
+        $i = 0;
+        foreach ($array as $raw_attendance) {
+            if ($raw_attendance->id != $id) {
+                $hydrated_array[] = $raw_attendance;
+                $hydrated_array[$i]->controls = [];
+                $id = $raw_attendance->id;
+                $i++;
+            }
+            if ($raw_attendance->control_type != null) {
+                if (!$type = AttendanceControl::toType($raw_attendance->control_type)) {
+                    throw new \Exception($raw_attendance->control_type.' control class not defined in AttendanceControl');
+                }
+                $hydrated_array[$i-1]->controls[]['control_type'] = $type;
+            }
+            if (property_exists($hydrated_array[$i-1], 'control_type')) {
+                unset($hydrated_array[$i-1]->control_type);
+            }            
+        }
+        
+        return $hydrated_array;
+    }
 
 }

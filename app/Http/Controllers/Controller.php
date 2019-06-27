@@ -14,9 +14,10 @@ use Illuminate\Support\Collection;
 
 class Controller extends BaseController
 {
+
     protected $application = null;
     private $request = null;
-    
+
     public function __construct(Request $request)
     {
         $this->request = $request;
@@ -27,21 +28,21 @@ class Controller extends BaseController
     {
         return $this->application;
     }
-    
+
     private function setApplication($application)
     {
         $this->application = $application;
     }
-    
+
     protected function getFromUser(User $user)
     {
         throw new \Exception('Method "getFromUser" not implemented in subclass (must be overridden).');
     }
-    
+
     public function getFromUserHashId(Request $request, $user_hash_id)
     {
         $user = User::findByHashId($user_hash_id)->firstOrFail();
-        
+
         return $this->getFromUser($user);
     }
 
@@ -49,43 +50,61 @@ class Controller extends BaseController
     {
         return $this->getFromUser(Auth::user());
     }
-    
+
     public function validate(Request $request, array $rules, array $messages = array(), array $customAttributes = array())
     {
         try {
             parent::validate($request, $rules, $messages, $customAttributes);
-        }
-        catch (ValidationException $e) {
+        } catch (ValidationException $e) {
             throw new CustomValidationException($e);
         }
     }
-    
-    protected function getSearchValue() 
+
+    protected function getSearchValue()
     {
         $search_value = null;
         if ($this->request->has('search')) {
             $search_value = $this->request->get('search');
         }
-        return $search_value; 
+        return $search_value;
     }
-    
+
     protected function getUsersFromRequest(Request $request, $with = [])
     {
         $app_id = $this->getApplication()->id;
         if ($request->input('users')) {
-            
-            return UserApplication::with($with)->findByApplicationAndExternalId( $app_id, $request->input('users') )->get();
+
+            return UserApplication::with($with)->findByApplicationAndExternalId($app_id, $request->input('users'))->get();
         }
         return new \Illuminate\Support\Collection([]);
     }
-    
+
     protected function hydratePage(Paginator $paginated_collection, $class)
     {
-        $paginated_collection->setCollection($class::hydrate($paginated_collection->getCollection()->toArray()));
+        $array_collection = $this->prepareForHydrate(
+                $class,
+                $paginated_collection->getCollection()->toArray()
+        );
+
+        $paginated_collection->setCollection($class::hydrate($array_collection));
     }
-    
+
     protected function hydrateCollection(Collection &$collection, $class)
     {
-        $collection = $class::hydrate($collection->toArray());
+        $array_collection = $this->prepareForHydrate(
+                $class,
+                $collection->toArray()
+        );
+        
+        $collection = $class::hydrate($array_collection);
     }
+
+    protected function prepareForHydrate($class, $array)
+    {
+        if (method_exists($class, 'prepareForHydrate')) {
+            return $class::prepareForHydrate($array);
+        }
+        return $array;
+    }
+
 }
