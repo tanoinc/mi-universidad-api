@@ -4,6 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Library\AttendanceControls\AttendanceIPControl;
+use App\Library\AttendanceControls\AttendanceGeolocationControl;
+use App\Library\AttendanceControls\AttendanceQRControl;
 
 /**
  * The attendance controls model class
@@ -14,8 +16,13 @@ class AttendanceControl extends Model
 {
     
     CONST TYPE_IP = 'ip';
+    CONST TYPE_GEOLOCATION = 'geolocation';
+    CONST TYPE_QR = 'qr';
+    
     CONST TYPES = [
         self::TYPE_IP => AttendanceIPControl::class,
+        self::TYPE_GEOLOCATION => AttendanceGeolocationControl::class,
+        self::TYPE_QR => AttendanceQRControl::class,
     ];
     
     protected $table = 'attendance_control';

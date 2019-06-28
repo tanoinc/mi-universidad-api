@@ -15,7 +15,7 @@ class AttendanceControlException extends GenericErrorException
     }
     public function getCustomMessage()
     {
-        return trim("Forbidden: Attendance control condition not met. ".$this->getMessage());
+        return trim("Forbidden: Attendance control condition not met: ".$this->getMessage());
     }
     public function getStatusCode()
     {

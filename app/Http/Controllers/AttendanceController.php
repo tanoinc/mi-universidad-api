@@ -35,7 +35,7 @@ class AttendanceController extends AbstractInformationController
         );
     }
 
-    public function changeStatus($attendance_id)
+    public function changeStatusPresent($attendance_id)
     {
         $attendance = Attendance::findOrFail($attendance_id);
         
@@ -58,7 +58,7 @@ class AttendanceController extends AbstractInformationController
         $controls = new AttendanceControlValidator($attendance, app('request'));
         if (!$controls->allValid()) 
         {
-            throw new \App\Exceptions\AttendanceControlException();
+            throw new \App\Exceptions\AttendanceControlException($controls->getInvalidControl());
         }
         
     }    

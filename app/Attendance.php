@@ -84,7 +84,7 @@ class Attendance extends AbstractInformation
             return [];
         }
         
-        if (!isset($array[0]->control_type)) {
+        if (!property_exists($array[0], 'control_type')) {
             return $array;
         }
         
@@ -102,7 +102,7 @@ class Attendance extends AbstractInformation
                 if (!$type = AttendanceControl::toType($raw_attendance->control_type)) {
                     throw new \Exception($raw_attendance->control_type.' control class not defined in AttendanceControl');
                 }
-                $hydrated_array[$i-1]->controls[]['control_type'] = $type;
+                $hydrated_array[$i-1]->controls[] = $type;
             }
             if (property_exists($hydrated_array[$i-1], 'control_type')) {
                 unset($hydrated_array[$i-1]->control_type);

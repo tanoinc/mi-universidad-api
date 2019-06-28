@@ -3,7 +3,7 @@
 namespace App\Library\AttendanceControls;
 
 /**
- * Description of IPControl
+ * Controls if the user is in a given network (by its mask).
  *
  * @author lucianoc
  */
