@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Represents the "mi-universidad" user attendance status to attendance events.
@@ -61,5 +62,20 @@ class AttendanceUser extends Model
     {
         $this->status = static::STATUS_PRESENT;
     }
-    
+
+    public static function fnWithAttendanceUser(User $user)
+    {
+        return function ($query) use ($user) {
+            if (!is_int($user->id)) {
+                throw new Exception('Invalid user id type');
+            }
+            return $query
+                    ->addSelect('attendance_user.status as status')
+                    ->leftJoin('attendance_user', function($join) use ($user) {
+                        $join->on('attendance_user.attendance_id', '=', 'attendance.id');
+                        $join->on('attendance_user.user_id', '=', DB::raw($user->id) );
+                    })
+                    ;
+        };
+    }    
 }

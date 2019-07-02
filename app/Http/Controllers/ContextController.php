@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use App\Context;
 use App\Application;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use App\User;
 
 class ContextController extends Controller
 {

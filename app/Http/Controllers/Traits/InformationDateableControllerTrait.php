@@ -73,7 +73,7 @@ trait InformationDateableControllerTrait
     protected function getResponseByFutureDate($start_date_field, $fn_custom_filter = null)
     {
         $dateable_information = $this->getByFutureDate($start_date_field, $fn_custom_filter);
-        
+
         return $this->getDateableResponse($dateable_information);
     }
 

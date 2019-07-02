@@ -10,7 +10,7 @@ use App\Exceptions\AttendanceInactiveException;
 use Illuminate\Support\Facades\Auth;
 use App\Library\AttendanceControls\AttendanceControlValidator;
 use App\AttendanceControl;
-
+use App\AttendanceUser;
 /**
  * The AttendanceController controller class
  *
@@ -23,15 +23,21 @@ class AttendanceController extends AbstractInformationController
     
     public function getFuture()
     {
+        $user = Auth::user();
+        
         return $this->getResponseByFutureDate(
                 'start_time', 
-                AttendanceControl::fnWithAttendanceControl());
+                $this->fnWithAttendanceUserAndControl($user)
+        );
     }
     
     public function getNow()
     {
-        return $this->getResponseByNowDate('start_time', 'end_time', 
-                AttendanceControl::fnWithAttendanceControl()
+        $user = Auth::user();
+        
+        return $this->getResponseByNowDate(
+                'start_time', 'end_time', 
+                $this->fnWithAttendanceUserAndControl($user)
         );
     }
 
@@ -80,7 +86,14 @@ class AttendanceController extends AbstractInformationController
         return false;
     }
     
-
+    protected function fnWithAttendanceUserAndControl(User $user)
+    {
+        return function ($query) use ($user) {
+            $fn_control = AttendanceControl::fnWithAttendanceControl();
+            $fn_user = AttendanceUser::fnWithAttendanceUser($user);
+            return $fn_control($fn_user($query));
+        };
+    }
     
     protected function getModelClass()
     {
