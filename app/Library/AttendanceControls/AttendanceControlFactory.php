@@ -5,6 +5,7 @@ namespace App\Library\AttendanceControls;
 use App\AttendanceControl;
 use App\Attendance;
 use Illuminate\Http\Request;
+use App\Exceptions\AttendanceControlClassNotFoundException;
 
 /**
  * Attendance Control factory class
@@ -27,9 +28,7 @@ class AttendanceControlFactory
     {
         $control_class = $attendance_control->type;
         
-        if (!in_array($control_class, AttendanceControl::typeClasses())) {
-            throw new ClassNotFoundException("Control class '{$control_class}' not found for attendance control");
-        }
+        AbstractAttendanceControl::checkValidClass($control_class);
         
         return new $control_class(
                 static::decodeParameters($attendance_control->parameters),

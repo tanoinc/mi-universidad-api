@@ -66,6 +66,7 @@ abstract class AbstractInformationController extends Controller
         $information = $this->newFromRequest($request);
         $information->save();
         $this->setUsersFromRequest($information, $request);
+        $this->customSave($information);
         $notifications = null;
         if ($information->send_notification) {
             $notifications = $this->sendNotifications($pushService, $information);
@@ -99,6 +100,10 @@ abstract class AbstractInformationController extends Controller
         return ($information->application_id == $this->getApplication()->id);
     }
 
+    protected function customSave(AbstractInformation $information)
+    {
+        
+    }
 
     protected function sendNotifications(PushNotificationsInterface $pushService, AbstractInformation $information) {
         $notifications = [];
