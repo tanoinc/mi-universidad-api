@@ -1,4 +1,4 @@
-FROM php:7.1-apache
+FROM php:7.1-apache-stretch
 
 ARG REVISION
 ENV APACHE_DOCUMENT_ROOT /app/public
