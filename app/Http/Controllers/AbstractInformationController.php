@@ -11,11 +11,11 @@ namespace App\Http\Controllers;
 use App\AbstractInformation;
 use Illuminate\Http\Request;
 use App\User;
-use App\UserApplication;
 use App\Context;
 use App\Application;
 use App\Library\Generic\PushNotificationsInterface;
 use App\Notification;
+use Illuminate\Pagination\Paginator;
 
 /**
  * The Ageneral Information controller abstract class
@@ -36,16 +36,21 @@ abstract class AbstractInformationController extends Controller
         return response()->json($information);
     }
     
-    protected function getQueryFromUser(User $user) 
+    protected function getQueryFromUser(User $user, $fn_filter = null) 
     {
         $model_class = $this->getModelClass();
-        return $model_class::fromUser($user);
+        return $model_class::fromUser($user, $fn_filter);
     }
 
-    protected function hydrateInformation($paginatedCollection)
+    protected function hydrateInformation(&$collection)
     {
         $model_class = $this->getModelClass();
-        $this->hydratePage($paginatedCollection, $model_class);
+        
+        if ($collection instanceof Paginator) {
+            $this->hydratePage($collection, $model_class);
+        } else {
+            $this->hydrateCollection($collection, $model_class);
+        }
     }
     
     protected function getFromUser(User $user, $order_by = 'created_at', $order = 'desc')
@@ -61,6 +66,7 @@ abstract class AbstractInformationController extends Controller
         $information = $this->newFromRequest($request);
         $information->save();
         $this->setUsersFromRequest($information, $request);
+        $this->customSave($information);
         $notifications = null;
         if ($information->send_notification) {
             $notifications = $this->sendNotifications($pushService, $information);
@@ -94,6 +100,10 @@ abstract class AbstractInformationController extends Controller
         return ($information->application_id == $this->getApplication()->id);
     }
 
+    protected function customSave(AbstractInformation $information)
+    {
+        
+    }
 
     protected function sendNotifications(PushNotificationsInterface $pushService, AbstractInformation $information) {
         $notifications = [];

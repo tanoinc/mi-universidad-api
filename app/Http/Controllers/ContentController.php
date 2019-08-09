@@ -43,7 +43,14 @@ class ContentController extends Controller
 
         return response()->json($contents);
     }
-
+    
+    public function get($id)
+    {
+        $content = Content::with(['contained'])->findOrFail($id);
+        
+        return response()->json($content);
+    }
+    
     protected function saveFromRequest($content, Request $request, $content_type_class = null)
     {
         $content->fill($request->all());

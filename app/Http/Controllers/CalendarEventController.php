@@ -18,7 +18,8 @@ use Illuminate\Support\Facades\Auth;
  */
 class CalendarEventController extends AbstractInformationController
 {
-
+    use Traits\InformationDateableControllerTrait;
+    
     protected function getModelClass()
     {
         return CalendarEvent::class;
@@ -59,11 +60,7 @@ class CalendarEventController extends AbstractInformationController
     
     public function getFuture()
     {
-        $information = $this->getQueryFromUser(Auth::user())
-            ->whereDate('event_date', '>=', \Carbon\Carbon::today()->toDateString())
-            ->orderBy('event_date', 'asc')->simplePaginate(env('ITEMS_PER_PAGE_DEFAULT', 20));
-
-        return response()->json($information);
+        return $this->getResponseByFutureDate('event_date');
     }
     
     public function getPast()

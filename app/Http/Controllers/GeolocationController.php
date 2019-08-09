@@ -8,9 +8,6 @@
 
 namespace App\Http\Controllers;
 
-use App\CalendarEvent;
-use Illuminate\Support\Facades\Auth;
-use App\User;
 use Illuminate\Http\Request;
 use App\UserApplication;
 /**

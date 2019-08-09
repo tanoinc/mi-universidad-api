@@ -29,5 +29,22 @@ class Geolocation extends Model
     {
         return $query->where('user_id', $user->id);
     }
+
+    public function scopeMostRecent($query)
+    {
+        return $query->orderBy('updated_at', 'desc');
+    }
     
+    public function isRecentlyUpdated($minutes = 5)
+    {
+        $someTimeAgo = new \DateTime();
+        $someTimeAgo->sub(new \DateInterval("PT{$minutes}M"));
+        
+        return ($this->updated_at > $someTimeAgo);
+    }
+    
+    public function isAccurate()
+    {
+        return $this->accuracy <= 100;
+    }
 }
