@@ -74,4 +74,19 @@ class AttendanceControl extends Model
         };
     }    
     
+    public function sameAs(AttendanceControl $control)
+    {
+        return $this->sameTypeAs($control) and $control->parameters == $this->parameters;
+    }
+    
+    public function sameTypeAs(AttendanceControl $control)
+    {
+        return $control->type == $this->type;
+    }
+    
+    public function copyFrom(AttendanceControl $control)
+    {
+        $this->type = $control->type;
+        $this->parameters = $control->parameters;
+    }
 }

@@ -2,6 +2,8 @@
 
 namespace App;
 
+use Illuminate\Support\Facades\DB;
+
 /**
  * The newsfeed model class
  *
@@ -70,6 +72,10 @@ class Attendance extends AbstractInformation
         return AttendanceUser::firstOrNew([ 'attendance_id' => $this->id, 'user_id' => $user->id ]);
     }
 
+    public function getAttendanceStatuses() {
+        return AttendanceUser::where([ 'attendance_id' => $this->id ]);
+    }    
+    
     public function setAttendanceUserPresent(User $user)
     {
         $attendance_user = $this->getAttendanceUser($user);
@@ -110,6 +116,17 @@ class Attendance extends AbstractInformation
         }
         
         return $hydrated_array;
+    }
+    
+    public function hasControl(AttendanceControl $control)
+    {
+        foreach ($this->controls()->get() as $attendance_control) {
+            if ($control->sameTypeAs($attendance_control)) {
+                return $attendance_control;
+            }
+        }
+        
+        return false;
     }
 
 }

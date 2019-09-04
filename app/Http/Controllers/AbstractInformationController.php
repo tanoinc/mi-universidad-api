@@ -82,6 +82,25 @@ abstract class AbstractInformationController extends Controller
             'notification_push_data_uuid' => $push_uuid
         ]);
     }
+
+    public function update(Request $request, $id)
+    {
+        $class = $this->getModelClass();
+        $information = $class::findOrFail($id);
+        
+        if (!$this->canUpdate($information)) {
+            throw new UnauthorizedAccessException();
+        }
+        
+        $information = $this->setFromRequest($information, $request);
+        $information->save();
+        $this->setUsersFromRequest($information, $request);
+        $this->customSave($information);
+        
+        return response()->json([
+            $this->getModelName() => $information
+        ]);        
+    }
     
     public function delete($id)
     {
@@ -96,6 +115,16 @@ abstract class AbstractInformationController extends Controller
     }
     
     protected function canDelete($information)
+    {
+        return ($information->application_id == $this->getApplication()->id);
+    }
+
+    protected function canUpdate($information)
+    {
+        return ($information->application_id == $this->getApplication()->id);
+    }
+
+    protected function canRetreieve($information)
     {
         return ($information->application_id == $this->getApplication()->id);
     }
@@ -147,7 +176,7 @@ abstract class AbstractInformationController extends Controller
     protected function setUsersFromRequest(AbstractInformation $information, Request $request)
     {
         $ids = $this->getUsersFromRequest($request)->map(function ($user_app) { return $user_app->user_id; });
-        $information->users()->attach($ids);
+        $information->users()->sync($ids);
     }
     protected function setFromRequest(AbstractInformation $information, Request $request)
     {

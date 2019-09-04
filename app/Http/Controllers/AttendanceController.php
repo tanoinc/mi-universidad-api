@@ -14,6 +14,7 @@ use App\AttendanceUser;
 use Illuminate\Validation\Rule;
 use App\Exceptions\AttendanceControlClassNotFoundException;
 use App\Library\AttendanceControls\AbstractAttendanceControl;
+use App\Exceptions\UnauthorizedAccessException;
 
 /**
  * The AttendanceController controller class
@@ -44,7 +45,22 @@ class AttendanceController extends AbstractInformationController
                 $this->fnWithAttendanceUserAndControl($user)
         );
     }
-
+    
+    public function getPresent($id)
+    {
+        $attendance = Attendance::findOrFail($id);
+        
+        if (!$this->canRetreieve($attendance)) {
+            throw new UnauthorizedAccessException();
+        }
+        
+        return response()->json( 
+                AttendanceUser::statusWithExternalIds($attendance)
+                ->presents()
+                ->get()
+        );
+    }
+    
     public function changeStatusPresent($attendance_id)
     {
         $attendance = Attendance::findOrFail($attendance_id);
@@ -139,7 +155,13 @@ class AttendanceController extends AbstractInformationController
                     $attendance, 
                     $control_request
             );
-            $attendance->controls->add($attendance_control);
+            
+            if (!$current_contol = $attendance->hasControl($attendance_control)) {
+                $attendance->controls->add($attendance_control);
+            } elseif (!$current_contol->sameAs($attendance_control)) {
+                $current_contol->copyFrom($attendance_control);
+                $current_contol->save();
+            }
         }
 
         return $attendance;
