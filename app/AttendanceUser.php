@@ -67,7 +67,7 @@ class AttendanceUser extends Model
                 throw new Exception('Invalid user id type');
             }
             return $query
-                            ->addSelect('attendance_user.status as status')
+                            ->addSelect(DB::raw('trim(attendance_user.status) as status'))
                             ->leftJoin('attendance_user', function($join) use ($user) {
                                 $join->on('attendance_user.attendance_id', '=', 'attendance.id');
                                 $join->on('attendance_user.user_id', '=', DB::raw($user->id));
