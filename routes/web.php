@@ -51,7 +51,9 @@ $router->group(['prefix' => 'v1','namespace' => '\App\Http\Controllers','middlew
 
     // Attendance
     $router->post('attendance','AttendanceController@create');
-    $router->delete('attendance/{id}','AttendanceController@delete');    
+    $router->delete('attendance/{id}','AttendanceController@delete');
+    $router->put('attendance/{id}','AttendanceController@update');
+    $router->get('attendance/{id}/present','AttendanceController@getPresent');
     
     // Application
     $router->get('application','ApplicationController@index');
