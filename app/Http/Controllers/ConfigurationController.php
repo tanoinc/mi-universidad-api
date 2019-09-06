@@ -25,13 +25,14 @@ class ConfigurationController extends Controller
         return response()->json(!empty($compatible));
     }
     
-    public function serviceStatus()
+    public function serviceStatus(\Illuminate\Http\Request $request)
     {
         return response()->json([
             'http' => true,
             'db' => $this->getStatusDb(),
             'app' => $this->getStatusApp(),
             'api_version' => $this->getApiVersion(),
+            'client_ip' => $request->ip(),
         ]);
     }
     

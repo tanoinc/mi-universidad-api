@@ -43,6 +43,7 @@ services:
       OAUTH_PUBLIC_KEY: ''
       CONTACT_EMAIL: 'contact@test.com'
       CONTACT_SUBJECT: '[miuniversidad]'
+      TRUSTED_PROXIES: ''
 
     ports:
       - "8081:80"

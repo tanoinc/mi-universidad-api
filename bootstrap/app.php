@@ -68,6 +68,7 @@ $app->routeMiddleware([
 
 $app->middleware([
     App\Http\Middleware\CorsMiddleware::class,
+    Fideloper\Proxy\TrustProxies::class,
 //   App\Http\Middleware\ExampleMiddleware::class
 ]);
 
@@ -99,6 +100,7 @@ $app->register(App\Providers\PushNotificationsServiceProvider::class);
 //$app->register(\Illuminate\Mail\MailServiceProvider::class);
 $app->register(\App\Providers\MailServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
+$app->register(Fideloper\Proxy\TrustedProxyServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
