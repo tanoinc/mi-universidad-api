@@ -16,6 +16,7 @@ use App\Application;
 use App\Library\Generic\PushNotificationsInterface;
 use App\Notification;
 use Illuminate\Pagination\Paginator;
+use App\Exceptions\UnauthorizedAccessException;
 
 /**
  * The Ageneral Information controller abstract class
