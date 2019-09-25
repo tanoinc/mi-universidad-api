@@ -12,7 +12,7 @@
 */
 
 $router->get('/', function () use ($router) {
-    return sprintf("Hola %s!", env('MOBILE_APP_NAME'));
+    return sprintf("Hello from %s!", env('MOBILE_APP_NAME'));
 });
 
 // Public
