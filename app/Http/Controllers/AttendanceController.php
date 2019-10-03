@@ -152,8 +152,7 @@ class AttendanceController extends AbstractInformationController
         
         foreach ($request->input('controls', []) as $control_request) {
             $attendance_control = $this->newAttendanceControlFromRequest(
-                    $attendance, 
-                    $control_request
+                $control_request
             );
             
             if (!$current_contol = $attendance->hasControl($attendance_control)) {
@@ -172,7 +171,7 @@ class AttendanceController extends AbstractInformationController
         $information->controls()->saveMany($information->controls);
     }
 
-    protected function newAttendanceControlFromRequest(Attendance $attendance, $control_request)
+    protected function newAttendanceControlFromRequest($control_request)
     {
         list($control_class, $parameters) = $this->getClassAndParametersFromRequest($control_request);
         
