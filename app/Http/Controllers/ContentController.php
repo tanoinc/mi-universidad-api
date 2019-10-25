@@ -39,14 +39,19 @@ class ContentController extends Controller
 
     public function index(Request $request)
     {
-        $contents = Content::fromApplication($this->getApplication())->with(['contained'])->orderBy('order','asc')->get();
+        $contents = Content::fromApplication($this->getApplication())
+                ->with(['contained'])
+                ->orderBy('order','asc')
+                ->get();
 
         return response()->json($contents);
     }
     
     public function get($id)
     {
-        $content = Content::with(['contained'])->findOrFail($id);
+        $content = Content::fromApplication($this->getApplication())
+                ->with(['contained'])
+                ->findOrFail($id);
         
         return response()->json($content);
     }
