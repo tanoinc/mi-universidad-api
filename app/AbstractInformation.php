@@ -75,8 +75,15 @@ abstract class AbstractInformation extends Model
         return ($this->id == $information->id);
     }
     
+    public function scopeFromApplicacion($query, Application $application)
+    {
+        return $query->where('application_id', '=', $application->id);
+    }
+
     protected abstract function getPrivilegeSendNotification();
+    
     public abstract function getNotificationTitle();
+    
     public abstract function getNotificationContent();
     
     public function getUsersForNotification()

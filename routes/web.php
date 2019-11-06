@@ -41,7 +41,7 @@ $router->group(['prefix' => 'v1','namespace' => '\App\Http\Controllers','middlew
     // Newsfeed
     $router->post('newsfeed','NewsfeedController@create');
     //$router->get('newsfeed/user/{user_hash_id}','NewsfeedController@getFromUserHashId');  //@TODO: Filtrar por aplicación
-    //$router->get('newsfeed','NewsfeedController@index'); //@TODO: Filtrar por aplicación
+    $router->get('newsfeed','NewsfeedController@retreieveFromAuthenticatedApplication');
 
     // Calendar events
     $router->post('calendar_event','CalendarEventController@create');
