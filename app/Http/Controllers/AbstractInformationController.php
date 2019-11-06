@@ -23,43 +23,28 @@ use App\Exceptions\UnauthorizedAccessException;
  *
  * @author tanoinc
  */
-
 abstract class AbstractInformationController extends Controller
 {
+
     abstract protected function getModelClass();
+
     abstract protected function getModelName();
 
     public function index()
     {
         $model_class = $this->getModelClass();
-        $information = $model_class::all()->simplePaginate(env('ITEMS_PER_PAGE_DEFAULT',20));
+        $information = $model_class::all()->simplePaginate(env('ITEMS_PER_PAGE_DEFAULT', 20));
 
         return response()->json($information);
     }
-    
-    protected function getQueryFromUser(User $user, $fn_filter = null) 
+
+    public function retreieveFromAuthenticatedApplication(Request $request)
     {
         $model_class = $this->getModelClass();
-        return $model_class::fromUser($user, $fn_filter);
-    }
+        $information = $model_class::fromApplicacion( $this->getApplication() )
+                ->simplePaginate(env('ITEMS_PER_PAGE_DEFAULT', 20));
 
-    protected function hydrateInformation(&$collection)
-    {
-        $model_class = $this->getModelClass();
-        
-        if ($collection instanceof Paginator) {
-            $this->hydratePage($collection, $model_class);
-        } else {
-            $this->hydrateCollection($collection, $model_class);
-        }
-    }
-    
-    protected function getFromUser(User $user, $order_by = 'created_at', $order = 'desc')
-    {
-        $result = $this->getQueryFromUser($user)->orderBy($order_by,$order)->simplePaginate(env('ITEMS_PER_PAGE_DEFAULT',20));
-        $this->hydrateInformation($result);
-
-        return response()->json( $result );
+        return response()->json($information);
     }
 
     public function create(Request $request, PushNotificationsInterface $pushService)
@@ -77,10 +62,10 @@ abstract class AbstractInformationController extends Controller
         if (!empty($notifications)) {
             $push_uuid = $notifications[0]->push_data_uuid;
         }
-        
+
         return response()->json([
-            $this->getModelName() => $information, 
-            'notification_push_data_uuid' => $push_uuid
+                    $this->getModelName() => $information,
+                    'notification_push_data_uuid' => $push_uuid
         ]);
     }
 
@@ -88,21 +73,21 @@ abstract class AbstractInformationController extends Controller
     {
         $class = $this->getModelClass();
         $information = $class::findOrFail($id);
-        
+
         if (!$this->canUpdate($information)) {
             throw new UnauthorizedAccessException();
         }
-        
+
         $information = $this->setFromRequest($information, $request);
         $information->save();
         $this->setUsersFromRequest($information, $request);
         $this->customSave($information);
-        
+
         return response()->json([
-            $this->getModelName() => $information
-        ]);        
+                    $this->getModelName() => $information
+        ]);
     }
-    
+
     public function delete($id)
     {
         $class = $this->getModelClass();
@@ -114,7 +99,32 @@ abstract class AbstractInformationController extends Controller
 
         return response()->json($information);
     }
-    
+
+    protected function getQueryFromUser(User $user, $fn_filter = null)
+    {
+        $model_class = $this->getModelClass();
+        return $model_class::fromUser($user, $fn_filter);
+    }
+
+    protected function hydrateInformation(&$collection)
+    {
+        $model_class = $this->getModelClass();
+
+        if ($collection instanceof Paginator) {
+            $this->hydratePage($collection, $model_class);
+        } else {
+            $this->hydrateCollection($collection, $model_class);
+        }
+    }
+
+    protected function getFromUser(User $user, $order_by = 'created_at', $order = 'desc')
+    {
+        $result = $this->getQueryFromUser($user)->orderBy($order_by, $order)->simplePaginate(env('ITEMS_PER_PAGE_DEFAULT', 20));
+        $this->hydrateInformation($result);
+
+        return response()->json($result);
+    }
+
     protected function canDelete($information)
     {
         return ($information->application_id == $this->getApplication()->id);
@@ -132,10 +142,11 @@ abstract class AbstractInformationController extends Controller
 
     protected function customSave(AbstractInformation $information)
     {
-        
+
     }
 
-    protected function sendNotifications(PushNotificationsInterface $pushService, AbstractInformation $information) {
+    protected function sendNotifications(PushNotificationsInterface $pushService, AbstractInformation $information)
+    {
         $notifications = [];
         $recipients = $information->getUsersForNotification();
         if (Notification::NOTIFY_ALL_USERS == $recipients) {
@@ -147,8 +158,8 @@ abstract class AbstractInformationController extends Controller
             }
         }
         try {
-            $push_data_uuid = $pushService->sendPushNotification($recipients, $information->getNotificationTitle(), $information->getNotificationContent(), ['type'=> get_class($information), 'object' => $information] );
-            foreach ($notifications as $notification ) {
+            $push_data_uuid = $pushService->sendPushNotification($recipients, $information->getNotificationTitle(), $information->getNotificationContent(), ['type' => get_class($information), 'object' => $information]);
+            foreach ($notifications as $notification) {
                 $notification->push_data_uuid = $push_data_uuid;
             }
         } catch (App\Exceptions\PushNotificationException $e) {
@@ -157,41 +168,44 @@ abstract class AbstractInformationController extends Controller
 
         return $notifications;
     }
-    
-    protected static function newNotification(User $user) 
+
+    protected static function newNotification(User $user)
     {
         $notification = new Notification();
         $notification->user()->associate($user);
-        
+
         return $notification;
     }
-    
+
     protected function newFromRequest(Request $request)
     {
         $model_class = $this->getModelClass();
         $information = new $model_class();
-        
+
         return $this->setFromRequest($information, $request);
     }
-    
+
     protected function setUsersFromRequest(AbstractInformation $information, Request $request)
     {
-        $ids = $this->getUsersFromRequest($request)->map(function ($user_app) { return $user_app->user_id; });
+        $ids = $this->getUsersFromRequest($request)->map(function ($user_app) {
+            return $user_app->user_id;
+        });
         $information->users()->sync($ids);
     }
+
     protected function setFromRequest(AbstractInformation $information, Request $request)
     {
         $this->validate($request, $this->getValidationRules());
         $information->application_id = $this->getApplication()->id;
-        $information->send_notification = ($request->input('send_notification')?1:0);
-        $information->global = ($request->input('global')?1:0);
+        $information->send_notification = ($request->input('send_notification') ? 1 : 0);
+        $information->global = ($request->input('global') ? 1 : 0);
         if ($request->has('context_name')) {
-            $information->context_id = $this->getContext($this->getApplication(), $request->input('context_name'), ($request->has('context_description')?$request->input('context_description'):null) )->id;
+            $information->context_id = $this->getContext($this->getApplication(), $request->input('context_name'), ($request->has('context_description') ? $request->input('context_description') : null))->id;
         }
-        
+
         return $this->setModelDataFromRequest($information, $request);
     }
-    
+
     abstract protected function setModelDataFromRequest(AbstractInformation $information, Request $request);
 
     protected function getContext(Application $app, $context_name, $context_description = null)
@@ -203,13 +217,13 @@ abstract class AbstractInformationController extends Controller
 
         return $context;
     }
-    
+
     protected function getValidationRules()
     {
-       return [
-           'context_name' => 'alpha_dash|max:150',
-           'context_description' => 'max:255',
-       ];
+        return [
+            'context_name' => 'alpha_dash|max:150',
+            'context_description' => 'max:255',
+        ];
     }
 
 }
