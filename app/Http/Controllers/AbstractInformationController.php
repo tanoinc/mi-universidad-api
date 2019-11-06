@@ -40,8 +40,7 @@ abstract class AbstractInformationController extends Controller
 
     public function retreieveFromAuthenticatedApplication(Request $request)
     {
-        $model_class = $this->getModelClass();
-        $information = $model_class::fromApplicacion( $this->getApplication() )
+        $information = $this->getQueryFromApplication( $this->getApplication() )
                 ->simplePaginate(env('ITEMS_PER_PAGE_DEFAULT', 20));
 
         return response()->json($information);
@@ -100,6 +99,12 @@ abstract class AbstractInformationController extends Controller
         return response()->json($information);
     }
 
+    protected function getQueryFromApplication(Application $application)
+    {
+        $model_class = $this->getModelClass();
+        return $model_class::fromApplicacion( $application );
+    }
+    
     protected function getQueryFromUser(User $user, $fn_filter = null)
     {
         $model_class = $this->getModelClass();

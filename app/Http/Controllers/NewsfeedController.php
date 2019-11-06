@@ -36,5 +36,10 @@ class NewsfeedController extends AbstractInformationController
         
         return $newsfeed;
     }
-
+    
+    protected function getQueryFromApplication(\App\Application $application)
+    {
+        return parent::getQueryFromApplication($application)->newestFirst();
+    }
+            
 }

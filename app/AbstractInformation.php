@@ -79,6 +79,11 @@ abstract class AbstractInformation extends Model
     {
         return $query->where('application_id', '=', $application->id);
     }
+    
+    public function scopeNewestFirst($query)
+    {
+        return $query->orderBy('created_at', 'desc');
+    }
 
     protected abstract function getPrivilegeSendNotification();
     
