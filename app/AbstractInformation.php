@@ -101,13 +101,13 @@ abstract class AbstractInformation extends Model
             return $this->users_notification;
         }
         $this->users_notification = [];
-        if ($this->send_notification and $application = $this->application()) {
+        if ($this->send_notification and $application = $this->application()->first()) {
             // @TODO: verificar que la version de los privilegios sea la misma que la version aceptada por el usuario.
             // if appliction has the privilege to send notifications
-            if ($application->first()->has_granted_privilege($this->getPrivilegeSendNotification()) ) { 
+            if ($application->has_granted_privilege($this->getPrivilegeSendNotification()) ) { 
                 if ($this->global) {
                     // All application's users
-                    $this->users_notification = $application->users()->get();
+                    $this->users_notification = $application->subscribed_users()->get();
                 } else {
                     // Specific notification recipients (private)
                     $this->users_notification = $this->users()->get();
