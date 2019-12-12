@@ -42,7 +42,7 @@ class ContentController extends Controller
         $contents = Content::fromApplication($this->getApplication())
                 ->with(['contained'])
                 ->orderBy('order','asc')
-                ->get();
+                ->simplePaginate(env('ITEMS_PER_PAGE_DEFAULT', 20));
 
         return response()->json($contents);
     }
