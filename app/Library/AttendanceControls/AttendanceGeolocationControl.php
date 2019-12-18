@@ -34,7 +34,7 @@ class AttendanceGeolocationControl extends AbstractAttendanceControl
     }
 
     public static function areValidParameters($parameters)
-    {
+    {        
         if (!isset($parameters->latitude)) {
             return false;
         }
@@ -43,7 +43,7 @@ class AttendanceGeolocationControl extends AbstractAttendanceControl
             return false;
         }
 
-        if (!isset($parameters->max_distance) or ! is_int($parameters->max_distance)) {
+        if (!isset($parameters->max_distance) or !(is_int($parameters->max_distance) or is_float($parameters->max_distance))) {
             return false;
         }
 
@@ -81,7 +81,7 @@ class AttendanceGeolocationControl extends AbstractAttendanceControl
                 $user_location->latitude, $user_location->longitude
         );
         
-        return ($distance <= ($this->parameters->max_distance + $user_location->accuracy));
+        return ($distance <= $this->parameters->max_distance );
     }
     
     /**
