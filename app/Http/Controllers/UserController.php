@@ -42,7 +42,7 @@ class UserController extends Controller
     {
         $this->validate($request, $this->getCreationConstraints());
         $user = User::registerByData($request->all());
-        $this->mailUserConfirmation($user);
+        $this->sendUserConfirmation($user);
         $user->save();
 
         return response()->json($user);
@@ -98,8 +98,8 @@ class UserController extends Controller
     {
         $this->validate($request, [ 'email' => 'required|email|max:255' ]);
         $user = User::findByEmail($request->get('email'))->first();
-        if ($user and $user->canRecoverPassword()) {
-            $this->mailRecoveryPassword($user);
+        if ($user and $user->canSendRecoveryCode()) {
+            $this->sendRecoveryCode($user);
             $user->save();
         }
         throw new AcceptedRequestForgotPasswordException();
@@ -112,17 +112,22 @@ class UserController extends Controller
             'code' => $this->getCodeValidation(),
             'password' => 'required|min:8|max:255',
         ]);
+        
         $user = User::findByEmail($request->get('email'))->first();
-        if ($user) {
-            if ($user->isRecoveryCodeValid($request->get('code'))) {
-                $user->setPassword($request->get('password'));
-                $user->save();
-                throw new AcceptedCodeForgotPasswordException();
-            } else {
-                $user->save();
-            }
+
+        if (!$user) {
+            throw new RejectedCodeForgotPasswordException();
         }
-        throw new RejectedCodeForgotPasswordException();
+        
+        if (!$user->isRecoveryCodeValid($request->get('code'))) {
+            $user->save();
+            throw new RejectedCodeForgotPasswordException();
+        }
+        
+        $user->setPassword($request->get('password'));
+        $user->save();
+        
+        throw new AcceptedCodeForgotPasswordException();
     }
     
     public function confirmUser(Request $request)
@@ -151,13 +156,13 @@ class UserController extends Controller
         throw new RejectedCodeConfirmUserException();
     }
     
-    protected function mailRecoveryPassword($user) {
+    protected function sendRecoveryCode($user) {
         $subject = env('MAIL_RECOVER_PASSWORD_SUBJECT','Mi Universidad: Password recovery');
         $message = env('MAIL_RECOVER_PASSWORD_MSG','Your \'Mi Universidad\' password recovery code is: %s');
         return $this->mailCode($user, $subject, $message);
     }
     
-    protected function mailUserConfirmation($user) {
+    protected function sendUserConfirmation($user) {
         $subject = env('MAIL_USER_CONFIRMATION_SUBJECT','Mi Universidad: Email Confirmation');
         $message = env('MAIL_USER_CONFIRMATION_MSG','Your \'Mi Universidad\' confirmation code is: %s');
         return $this->mailCode($user, $subject, $message);
