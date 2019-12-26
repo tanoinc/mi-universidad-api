@@ -22,7 +22,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     use HasApiTokens,
         Authenticatable,
         Authorizable;
-    
+
     const ORIGIN_MOBILE = 'mobile';
     const ORIGIN_FACEBOOK = 'facebook';
 
@@ -38,13 +38,13 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     {
         return $this->belongsToMany('App\Application', 'user_application');
     }
-    
+
     public function subscribed_applications()
     {
         return static::addApplicationSubscriptionCondition($this->applications());
     }
-    
-    public static function addApplicationSubscriptionCondition($query) 
+
+    public static function addApplicationSubscriptionCondition($query)
     {
         return $query->whereNotNull('granted_privilege_version');
     }
@@ -62,8 +62,8 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     public function attendances()
     {
         return $this->belongsToMany('App\Attendance', 'attendance_user');
-    }    
-    
+    }
+
     public function pushTokens()
     {
         return $this->hasMany('App\UserPushToken');
@@ -73,7 +73,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     {
         return $this->hasMany('App\Geolocation');
     }
-    
+
     public function scopeFindByHashId($query, $hash_id)
     {
         return $query->where('hash_id', '=', $hash_id);
@@ -82,18 +82,18 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     public function scopeFindByEmail($query, $email, $origin = User::ORIGIN_MOBILE)
     {
         return $query->where('email', '=', $email)->where('origin', $origin);
-    }    
-    
+    }
+
     protected static function normalize(&$data)
     {
         $data['username'] = strtolower(trim($data['username']));
         $data['email'] = strtolower(trim($data['email']));
     }
-    
+
     public static function registerByData($user_data, $origin = User::ORIGIN_MOBILE)
     {
         static::normalize($user_data);
-        $user = static::firstOrNew(['username' => $user_data['username'], 'origin' => $origin ]);
+        $user = static::firstOrNew(['username' => $user_data['username'], 'origin' => $origin]);
         $new = (!$user->hash_id);
         if ($new) {
             $user->hash_id = static::encodeHashId($user_data['username']);
@@ -106,7 +106,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
             $app = Application::findByName(env('MOBILE_APP_NAME'))->firstOrFail();
             $user->applications()->attach($app, ['granted_privilege_version' => $app->privilege_version, 'external_id' => $user->id]);
         }
-        
+
         return $user;
     }
 
@@ -118,19 +118,22 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
         return $user;
     }
-    
-    public function setPassword($password) {
+
+    public function setPassword($password)
+    {
         $this->password = static::encodePassword($password, $this->origin);
     }
 
-    public function confirm() {
+    public function confirm()
+    {
         $this->confirmed = true;
     }
-    
-    public function unconfirm() {
+
+    public function unconfirm()
+    {
         $this->confirmed = false;
     }
-    
+
     public static function setData(User $user, $user_data)
     {
         if (isset($user_data['password'])) {
@@ -149,8 +152,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
             $user->surname = $user_data['surname'];
         }
     }
-    
-    public function canRecoverPassword() {
+
+    public function canSendRecoveryCode()
+    {
         if (!$this->origin == User::ORIGIN_MOBILE) {
             return false;
         }
@@ -158,54 +162,60 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         if (!$this->last_password_recovery) {
             return true;
         }
-        
+
         $exiprationTime = new \DateTime($this->last_password_recovery);
-        $exiprationTime->modify('+'.env('MAIL_RECOVER_PASSWORD_CODE_RETRY_TIME', '10').' minutes');
+        $exiprationTime->modify('+' . env('MAIL_RECOVER_PASSWORD_CODE_RETRY_TIME', '10') . ' minutes');
         $now = new \DateTime();
-        
+
         return ($now >= $exiprationTime);
     }
-    
-    public function recoverPassword() {
+
+    public function recoverPassword()
+    {
         if ($this->origin == User::ORIGIN_MOBILE) {
             $this->recover_password_value = static::generateRecoverPasswordValue();
             $this->recover_password_count = 10;
             $this->last_password_recovery = new \DateTime();
         } else {
-            throw new \Exception($this->origin.' not supported for password recovery.');
+            throw new \Exception($this->origin . ' not supported for password recovery.');
         }
-        
+
         return $this->recover_password_value;
     }
-    
-    public function isRecoveryCodeValid($code) {
-        if ($this->recover_password_count === null or $this->recover_password_value === null or $this->recover_password_count <= 0) {
+
+    public function isRecoveryCodeValid($code)
+    {
+
+        if (!$this->canRecoverPassword()) {
             return false;
         }
-        if (!($this->recover_password_value == strtoupper($code))) {
+
+        if (strtoupper($this->recover_password_value) !== strtoupper($code)) {
             $this->recover_password_count--;
             return false;
         }
+
         $this->recover_password_value = null;
         $this->recover_password_count = null;
         $this->last_password_recovery = null;
-        
+        $this->confirm();
+
         return true;
     }
 
-    public static function encodePassword($password, $origin= User::ORIGIN_MOBILE)
+    public static function encodePassword($password, $origin = User::ORIGIN_MOBILE)
     {
-        if ( $origin == static::ORIGIN_FACEBOOK ) {
+        if ($origin == static::ORIGIN_FACEBOOK) {
             return $password;
         }
-        return password_hash($password, PASSWORD_DEFAULT);        
+        return password_hash($password, PASSWORD_DEFAULT);
     }
 
     public static function generateRecoverPasswordValue($long = 6)
     {
         return strtoupper(substr(bin2hex(random_bytes($long)), 0, $long));
     }
-    
+
     public static function encodeHashId($username)
     {
         return sha1(random_bytes(8) . $username);
@@ -225,17 +235,22 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     {
         return $this->password;
     }
-    
-    public function findForPassport($username) 
+
+    public function findForPassport($username)
     {
-        return $this->where('origin', static::ORIGIN_MOBILE)->where(function($q) use ($username){
-            $q
-                ->where('confirmed', true)
-                ->where(function($q2) use ($username){
-                    $username = strtolower($username);
-                    $q2->whereRaw('LOWER(email) LIKE ?', $username)->orWhereRaw('LOWER(username) LIKE ?', $username);
-                });            
-        })->first();
+        return $this->where('origin', static::ORIGIN_MOBILE)->where(function($q) use ($username) {
+                    $q
+                            ->where('confirmed', true)
+                            ->where(function($q2) use ($username) {
+                                $username = strtolower($username);
+                                $q2->whereRaw('LOWER(email) LIKE ?', $username)->orWhereRaw('LOWER(username) LIKE ?', $username);
+                            });
+                })->first();
+    }
+
+    protected function canRecoverPassword()
+    {
+        return !($this->recover_password_count === null or $this->recover_password_value === null or $this->recover_password_count <= 0);
     }
 
 }
